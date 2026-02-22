@@ -38,7 +38,7 @@ export default function PropertyCard({
                 {/* We use standard img for now to easily pull unsplash placeholders */}
                 <img src={imageUrl} alt={title} className="property-image" loading="lazy" />
                 <div className="property-overlay">
-                    <span className="view-btn">View Details</span>
+                    <span className="view-btn">Ver Detalles</span>
                 </div>
             </div>
 
@@ -54,11 +54,11 @@ export default function PropertyCard({
                 <div className="property-metrics">
                     <div className="metric">
                         <span className="metric-value">{bedrooms}</span>
-                        <span className="metric-label">Beds</span>
+                        <span className="metric-label">Habitaciones</span>
                     </div>
                     <div className="metric">
                         <span className="metric-value">{bathrooms}</span>
-                        <span className="metric-label">Baths</span>
+                        <span className="metric-label">Baños</span>
                     </div>
                     <div className="metric last-metric">
                         <span className="metric-value">{area}</span>

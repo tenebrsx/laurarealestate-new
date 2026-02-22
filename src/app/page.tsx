@@ -12,15 +12,15 @@ export default async function Home() {
       {/* Quick Search Panel */}
       <div className="search-panel glass-panel" style={{ marginTop: 0, marginBottom: 'var(--space-4xl)', maxWidth: '100%' }}>
         <div className="search-inputs">
-          <input type="text" placeholder="Search by City, Zip Code, Community Name" className="search-input" />
-          <button className="btn-search">Find Property</button>
+          <input type="text" placeholder="Buscar por Ciudad, Código Postal o Nombre de Comunidad" className="search-input" />
+          <button className="btn-search">Buscar Propiedad</button>
         </div>
       </div>
 
       {/* Featured Properties Section */}
       <section className="intro-section" style={{ paddingTop: 0, background: 'transparent' }}>
         <h1 style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2xl)', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>
-          Featured Listings
+          Propiedades Destacadas
         </h1>
 
         {/* Dynamic Property Grid */}

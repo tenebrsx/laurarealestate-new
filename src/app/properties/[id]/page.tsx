@@ -33,7 +33,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 </div>
                 <div className="container detail-hero-content animate-fade-in">
                     <div className="property-tags">
-                        <span className="tag">For Sale</span>
+                        <span className="tag">En Venta</span>
                         <span className="tag-price">{formattedPrice}</span>
                     </div>
                     <h1 className="detail-title">{property.title}</h1>
@@ -55,25 +55,25 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                         <div className="metrics-ribbon glass-panel">
                             <div className="metric-box">
                                 <span className="box-value">{property.bedrooms}</span>
-                                <span className="box-label">Bedrooms</span>
+                                <span className="box-label">Habitaciones</span>
                             </div>
                             <div className="metric-box">
                                 <span className="box-value">{property.bathrooms}</span>
-                                <span className="box-label">Bathrooms</span>
+                                <span className="box-label">Baños</span>
                             </div>
                             <div className="metric-box">
                                 <span className="box-value">{property.area}</span>
-                                <span className="box-label">Square Meters</span>
+                                <span className="box-label">Metros Cuadrados</span>
                             </div>
                         </div>
 
                         <div className="detail-section">
-                            <h2 className="section-heading">Property Overview</h2>
+                            <h2 className="section-heading">Descripción de la Propiedad</h2>
                             <div className="property-description">
                                 {property.description ? (
                                     <div dangerouslySetInnerHTML={{ __html: property.description.replace(/\n/g, '<br/>') }} />
                                 ) : (
-                                    <p>No description provided for this exclusive property.</p>
+                                    <p>No se proporcionó descripción para esta propiedad exclusiva.</p>
                                 )}
                             </div>
                         </div>
@@ -81,7 +81,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                         {/* Photo Gallery Grid */}
                         {property.images && property.images.length > 0 && (
                             <div className="detail-section">
-                                <h2 className="section-heading">Gallery</h2>
+                                <h2 className="section-heading">Galería de Fotos</h2>
                                 <div className="photo-gallery">
                                     {property.images.map((img, idx) => (
                                         <div key={idx} className="gallery-thumbnail">
@@ -100,25 +100,25 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                                 <div className="agent-avatar-large">LA</div>
                                 <div className="agent-info">
                                     <h3 className="agent-name">Laura Alba</h3>
-                                    <p className="agent-title">Exclusive Real Estate Broker</p>
+                                    <p className="agent-title">Corredora Inmobiliaria Exclusiva</p>
                                 </div>
                             </div>
 
                             <form className="contact-form">
                                 <div className="form-group">
-                                    <input type="text" placeholder="Your Name" required className="form-input" />
+                                    <input type="text" placeholder="Tu Nombre" required className="form-input" />
                                 </div>
                                 <div className="form-group">
-                                    <input type="email" placeholder="Your Email" required className="form-input" />
+                                    <input type="email" placeholder="Tu Correo Electrónico" required className="form-input" />
                                 </div>
                                 <div className="form-group">
-                                    <textarea placeholder="I am interested in this property..." required className="form-textarea" rows={4}></textarea>
+                                    <textarea placeholder="Estoy interesado/a en esta propiedad..." required className="form-textarea" rows={4}></textarea>
                                 </div>
-                                <button type="submit" className="btn-submit">Request Information</button>
+                                <button type="submit" className="btn-submit">Solicitar Información</button>
                             </form>
 
                             <div className="direct-contact">
-                                <p>Or contact directly:</p>
+                                <p>O contáctenos directamente:</p>
                                 <a href="mailto:contact@lauraalba.com" className="contact-link">contact@lauraalba.com</a>
                             </div>
                         </div>

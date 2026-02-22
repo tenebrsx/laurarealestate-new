@@ -3,8 +3,8 @@ import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 
 export const metadata: Metadata = {
-  title: 'Laura Alba | Exclusive Real Estate',
-  description: 'Discover premium real estate properties with Laura Alba. Your gateway to exclusive homes and luxury living.',
+  title: 'Laura Alba | Bienes Raíces Exclusivos',
+  description: 'Descubre propiedades premium con Laura Alba. Tu puerta de entrada a hogares exclusivos y al lujo.',
 };
 
 export default function RootLayout({

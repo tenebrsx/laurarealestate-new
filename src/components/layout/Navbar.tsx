@@ -21,15 +21,15 @@ export default function Navbar() {
         <Link href="/" className="nav-logo">
           LAURA ALBA
         </Link>
-        
+
         <div className="nav-links">
-          <Link href="/" className="nav-link">Home</Link>
-          <Link href="/properties" className="nav-link">Properties</Link>
-          <Link href="/about" className="nav-link">About</Link>
+          <Link href="/" className="nav-link">Inicio</Link>
+          <Link href="/properties" className="nav-link">Propiedades</Link>
+          <Link href="/about" className="nav-link">Nosotros</Link>
         </div>
 
         <div className="nav-actions">
-          <button className="btn-contact">Contact Agent</button>
+          <button className="btn-contact">Contactar Agente</button>
         </div>
       </div>
     </nav>
