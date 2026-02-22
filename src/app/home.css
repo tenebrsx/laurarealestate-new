@@ -283,3 +283,21 @@
         height: 300px;
     }
 }
+
+/* --- Categories & Zones --- */
+.category-pill,
+.zone-card {
+    transition: all 0.3s ease;
+}
+
+.category-pill:hover,
+.zone-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-primary) !important;
+    background: var(--bg-secondary);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.zone-card:hover h3 {
+    color: var(--accent-primary) !important;
+}
