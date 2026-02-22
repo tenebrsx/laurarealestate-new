@@ -8,17 +8,7 @@ export default async function PropertiesPage() {
 
     return (
         <div className="properties-page">
-            <div className="properties-header">
-                <div className="container">
-                    <span className="page-subtitle">[ EXCLUSIVE LISTINGS ]</span>
-                    <h1 className="page-title">Curated Spaces</h1>
-                    <p className="page-description">
-                        Discover our collection of premium properties tailored to elevate your lifestyle.
-                    </p>
-                </div>
-            </div>
-
-            <div className="container">
+            <div className="container" style={{ paddingTop: 'var(--space-2xl)' }}>
                 <div className="properties-grid animate-fade-in">
                     {properties.map((property: Property) => (
                         <PropertyCard key={property.id} {...property} />
