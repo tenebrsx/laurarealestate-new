@@ -1,4 +1,5 @@
 // EasyBroker API Integration Service
+import { Property } from "@/types/property";
 
 export interface EasyBrokerImage {
     url: string;
@@ -43,6 +44,8 @@ export function mapPropertyData(data: EasyBrokerProperty) {
         price: mainOperation ? mainOperation.amount : 0,
         currency: mainOperation ? mainOperation.currency : 'USD',
         operationType: (mainOperation?.type === 'rental' ? 'rental' : 'sale') as 'sale' | 'rental',
+        latitude: typeof data.location === 'object' ? data.location?.latitude : undefined,
+        longitude: typeof data.location === 'object' ? data.location?.longitude : undefined,
         bedrooms: data.bedrooms || 0,
         bathrooms: data.bathrooms || 0,
         area: data.construction_size || 0,
@@ -93,7 +96,7 @@ export async function getProperties(limit = 20, page = 1) {
     }
 }
 
-export async function getPropertyById(id: string) {
+export async function getPropertyById(id: string): Promise<Property> {
     const apiKey = process.env.EASYBROKER_API_KEY;
 
     if (!apiKey) {

@@ -1,5 +1,6 @@
 import { getPropertyById } from '@/services/easybroker';
 import { notFound } from 'next/navigation';
+import DynamicMap from '@/components/map/DynamicMap';
 import './property-detail.css';
 
 interface PageProps {
@@ -83,12 +84,25 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                             <div className="detail-section">
                                 <h2 className="section-heading">Galería de Fotos</h2>
                                 <div className="photo-gallery">
-                                    {property.images.map((img, idx) => (
+                                    {property.images.map((img: string, idx: number) => (
                                         <div key={idx} className="gallery-thumbnail">
                                             <img src={img} alt={`${property.title} - View ${idx + 1}`} loading="lazy" />
                                         </div>
                                     ))}
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Property Map */}
+                        {property.latitude && property.longitude && (
+                            <div className="detail-section" style={{ marginTop: 'var(--space-2xl)' }}>
+                                <h2 className="section-heading">Ubicación</h2>
+                                <DynamicMap
+                                    latitude={property.latitude}
+                                    longitude={property.longitude}
+                                    title={property.title}
+                                    showExact={true}
+                                />
                             </div>
                         )}
                     </div>
