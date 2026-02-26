@@ -45,7 +45,7 @@ export function mapPropertyData(data: EasyBrokerProperty) {
         bedrooms: data.bedrooms || 0,
         bathrooms: data.bathrooms || 0,
         area: data.construction_size || 0,
-        imageUrl: data.title_image_full || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80',
+        imageUrl: data.title_image_full || data.images?.[0]?.url || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80',
         description: data.description || '',
         images: data.images?.map(img => img.url) || []
     };
