@@ -7,7 +7,17 @@ export interface EasyBrokerImage {
 export interface EasyBrokerProperty {
     public_id: string;
     title: string;
-    location: string;
+    location: {
+        name: string;
+        latitude?: number;
+        longitude?: number;
+        street?: string;
+        postal_code?: string;
+        show_exact_location?: boolean;
+        hide_exact_location?: boolean;
+        exterior_number?: string;
+        interior_number?: string;
+    };
     operations: {
         type: string;
         amount: number;
@@ -29,7 +39,7 @@ export function mapPropertyData(data: EasyBrokerProperty) {
     return {
         id: data.public_id,
         title: data.title,
-        location: data.location,
+        location: typeof data.location === 'object' ? (data.location?.name || 'Ubicación no disponible') : (data.location || 'Ubicación no disponible'),
         price: mainOperation ? mainOperation.amount : 0,
         currency: mainOperation ? mainOperation.currency : 'USD',
         bedrooms: data.bedrooms || 0,
