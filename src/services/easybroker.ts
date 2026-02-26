@@ -52,13 +52,13 @@ export function mapPropertyData(data: EasyBrokerProperty) {
     };
 }
 
-export async function getProperties(limit = 9, page = 1) {
+export async function getProperties(limit = 20, page = 1) {
     const apiKey = process.env.EASYBROKER_API_KEY;
 
     // If no API key, return mock data to prevent build crashing during demo
     if (!apiKey) {
         console.warn("No EASYBROKER_API_KEY found. Returning mock data.");
-        return getMockProperties();
+        return { properties: getMockProperties(), pagination: { total: 3, page: 1, totalPages: 1 } };
     }
 
     try {
@@ -75,10 +75,21 @@ export async function getProperties(limit = 9, page = 1) {
         }
 
         const json = await res.json();
-        return json.content.map(mapPropertyData);
+        const properties = json.content.map(mapPropertyData);
+        const total = json.pagination?.total || properties.length;
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            properties,
+            pagination: {
+                total,
+                page,
+                totalPages,
+            }
+        };
     } catch (error) {
         console.error("Error fetching EasyBroker properties:", error);
-        return getMockProperties(); // Fallback
+        return { properties: getMockProperties(), pagination: { total: 3, page: 1, totalPages: 1 } }; // Fallback
     }
 }
 

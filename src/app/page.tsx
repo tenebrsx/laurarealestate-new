@@ -5,7 +5,7 @@ import './home.css';
 
 export default async function Home() {
   // Fetch featured properties directly on the server
-  const featuredProperties = await getProperties(6);
+  const { properties: featuredProperties } = await getProperties(6);
   return (
     <div className="home-wrapper">
 
