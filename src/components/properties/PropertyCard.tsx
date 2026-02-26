@@ -7,6 +7,7 @@ interface PropertyProps {
     location: string;
     price: number;
     currency: string;
+    operationType: 'sale' | 'rental';
     bedrooms: number;
     bathrooms: number;
     area: number;
@@ -19,6 +20,7 @@ export default function PropertyCard({
     location,
     price,
     currency,
+    operationType,
     bedrooms,
     bathrooms,
     area,
@@ -67,7 +69,9 @@ export default function PropertyCard({
                 </div>
 
                 <div className="property-footer">
-                    <span className="property-price">{formattedPrice}</span>
+                    <span className="property-price">
+                        {formattedPrice}{operationType === 'rental' ? <span style={{ fontSize: '0.75em', color: 'var(--text-secondary)', fontWeight: 400 }}>/mes</span> : ''}
+                    </span>
                 </div>
             </div>
         </Link>

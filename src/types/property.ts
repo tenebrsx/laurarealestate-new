@@ -4,6 +4,7 @@ export interface Property {
     location: string;
     price: number;
     currency: string;
+    operationType: 'sale' | 'rental';
     bedrooms: number;
     bathrooms: number;
     area: number;

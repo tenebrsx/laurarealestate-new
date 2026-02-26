@@ -33,8 +33,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 </div>
                 <div className="container detail-hero-content animate-fade-in">
                     <div className="property-tags">
-                        <span className="tag">En Venta</span>
-                        <span className="tag-price">{formattedPrice}</span>
+                        <span className="tag">{property.operationType === 'rental' ? 'En Alquiler' : 'En Venta'}</span>
+                        <span className="tag-price">{formattedPrice}{property.operationType === 'rental' ? '/mes' : ''}</span>
                     </div>
                     <h1 className="detail-title">{property.title}</h1>
                     <p className="detail-location">
