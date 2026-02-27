@@ -1,23 +1,11 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
-import L from 'leaflet';
 import Link from 'next/link';
 import { Property } from '@/types/property';
 import './map-browse.css';
-
-// Fix for default marker icon in Next.js
-const icon = L.icon({
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
 
 interface PropertiesMapBrowseProps {
     properties: Property[];
@@ -68,15 +56,21 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
                     className="leaflet-full-map"
                 >
                     <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                     />
 
                     {mappableProperties.map(property => (
-                        <Marker
+                        <CircleMarker
                             key={property.id}
-                            position={[property.latitude!, property.longitude!]}
-                            icon={icon}
+                            center={[property.latitude!, property.longitude!]}
+                            pathOptions={{
+                                color: 'var(--accent-primary)',
+                                fillColor: 'var(--accent-primary)',
+                                fillOpacity: 0.6,
+                                weight: 2
+                            }}
+                            radius={8}
                         >
                             <Popup className="custom-popup">
                                 <Link href={`/properties/${property.id}`} className="popup-link">
@@ -88,7 +82,7 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
                                     </div>
                                 </Link>
                             </Popup>
-                        </Marker>
+                        </CircleMarker>
                     ))}
                 </MapContainer>
             </div>

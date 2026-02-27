@@ -40,27 +40,26 @@ export default function PropertyMap({ latitude, longitude, title, showExact = tr
             style={{ height: '400px', width: '100%', borderRadius: 'var(--radius-md)', zIndex: 1 }}
         >
             <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
             />
 
-            {showExact ? (
-                <Marker position={[latitude, longitude]} icon={icon}>
-                    <Popup>
-                        <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 500 }}>{title}</span>
-                    </Popup>
-                </Marker>
-            ) : (
-                <Circle
-                    center={[latitude, longitude]}
-                    pathOptions={{ color: 'var(--accent-primary)', fillColor: 'var(--accent-primary)', fillOpacity: 0.2 }}
-                    radius={500}
-                >
-                    <Popup>
-                        <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 500 }}>Ubicación aproximada: {title}</span>
-                    </Popup>
-                </Circle>
-            )}
+            <Circle
+                center={[latitude, longitude]}
+                pathOptions={{
+                    color: 'var(--accent-primary)',
+                    fillColor: 'var(--accent-primary)',
+                    fillOpacity: 0.4,
+                    weight: 2
+                }}
+                radius={showExact ? 100 : 500}
+            >
+                <Popup>
+                    <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 500 }}>
+                        {showExact ? title : `Ubicación aproximada: ${title}`}
+                    </span>
+                </Popup>
+            </Circle>
         </MapContainer>
     );
 }
