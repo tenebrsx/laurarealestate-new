@@ -1,6 +1,7 @@
 'use client';
 
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -17,6 +18,18 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    const formatMapPrice = (price: number, currency: string) => {
+        const symbol = currency === 'USD' ? 'US$' : 'RD$';
+        if (price >= 1000000) {
+            const m = price / 1000000;
+            return `${symbol}${m % 1 === 0 ? m : m.toFixed(1)}m`;
+        } else if (price >= 1000) {
+            const k = price / 1000;
+            return `${symbol}${k % 1 === 0 ? k : k.toFixed(1)}k`;
+        }
+        return `${symbol}${price}`;
+    };
 
     // Filter properties that actually have coordinates
     const mappableProperties = properties.filter(p => p.latitude && p.longitude);
@@ -60,30 +73,33 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
                         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                     />
 
-                    {mappableProperties.map(property => (
-                        <CircleMarker
-                            key={property.id}
-                            center={[property.latitude!, property.longitude!]}
-                            pathOptions={{
-                                color: 'var(--accent-primary)',
-                                fillColor: 'var(--accent-primary)',
-                                fillOpacity: 0.6,
-                                weight: 2
-                            }}
-                            radius={8}
-                        >
-                            <Popup className="custom-popup">
-                                <Link href={`/properties/${property.id}`} className="popup-link">
-                                    <div className="popup-img" style={{ backgroundImage: `url(${property.imageUrl})` }}></div>
-                                    <div className="popup-content">
-                                        <span className="popup-tag">{property.operationType === 'rental' ? 'Alquiler' : 'Venta'}</span>
-                                        <h4 className="popup-title">{property.title}</h4>
-                                        <p className="popup-price">{new Intl.NumberFormat('en-US', { style: 'currency', currency: property.currency, maximumFractionDigits: 0 }).format(property.price)}</p>
-                                    </div>
-                                </Link>
-                            </Popup>
-                        </CircleMarker>
-                    ))}
+                    {mappableProperties.map(property => {
+                        const customIcon = L.divIcon({
+                            className: 'custom-price-marker',
+                            html: `<div class="price-bubble">${formatMapPrice(property.price, property.currency)}</div>`,
+                            iconSize: [0, 0], // Sizing is handled by CSS
+                            iconAnchor: [30, 15],
+                        });
+
+                        return (
+                            <Marker
+                                key={property.id}
+                                position={[property.latitude!, property.longitude!]}
+                                icon={customIcon}
+                            >
+                                <Popup className="custom-popup">
+                                    <Link href={`/properties/${property.id}`} className="popup-link">
+                                        <div className="popup-img" style={{ backgroundImage: `url(${property.imageUrl})` }}></div>
+                                        <div className="popup-content">
+                                            <span className="popup-tag">{property.operationType === 'rental' ? 'Alquiler' : 'Venta'}</span>
+                                            <h4 className="popup-title">{property.title}</h4>
+                                            <p className="popup-price">{new Intl.NumberFormat('en-US', { style: 'currency', currency: property.currency, maximumFractionDigits: 0 }).format(property.price)}</p>
+                                        </div>
+                                    </Link>
+                                </Popup>
+                            </Marker>
+                        );
+                    })}
                 </MapContainer>
             </div>
         </div>
