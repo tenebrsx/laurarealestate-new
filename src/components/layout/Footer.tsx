@@ -28,14 +28,14 @@ export default function Footer() {
                     <div className="footer-column">
                         <h4>Contacto</h4>
                         <p className="footer-contact-item">info@lauraalba.com</p>
-                        <p className="footer-contact-item">+1 (809) 555-0192</p>
+                        <p className="footer-contact-item">+1 (809) 299-7077</p>
                         <p className="footer-contact-item">Santo Domingo, D.N.</p>
                     </div>
 
                     <div className="footer-column">
                         <h4>Síguenos</h4>
-                        <a href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
-                        <a href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                        <a href="https://www.instagram.com/lauraalba_realestate/?hl=en" target="_blank" rel="noopener noreferrer">Instagram</a>
+                        <a href="https://do.linkedin.com/in/laura-alba-04738361" target="_blank" rel="noopener noreferrer">LinkedIn</a>
                         <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
                     </div>
                 </div>
