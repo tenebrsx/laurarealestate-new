@@ -36,7 +36,6 @@ export default function Footer() {
                         <h4>Síguenos</h4>
                         <a href="https://www.instagram.com/lauraalba_realestate/?hl=en" target="_blank" rel="noopener noreferrer">Instagram</a>
                         <a href="https://do.linkedin.com/in/laura-alba-04738361" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                        <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
                     </div>
                 </div>
             </div>
