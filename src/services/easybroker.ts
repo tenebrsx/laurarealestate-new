@@ -23,9 +23,13 @@ export interface EasyBrokerProperty {
         type: string;
         amount: number;
         currency: string;
+        formatted_amount?: string;
+        unit?: string;
     }[];
     bedrooms: number | null;
     bathrooms: number | null;
+    parking_spaces: number | null;
+    property_type: string;
     construction_size: number | null;
     title_image_full: string;
     images?: EasyBrokerImage[];
@@ -43,11 +47,15 @@ export function mapPropertyData(data: EasyBrokerProperty) {
         location: typeof data.location === 'object' ? (data.location?.name || 'Ubicación no disponible') : (data.location || 'Ubicación no disponible'),
         price: mainOperation ? mainOperation.amount : 0,
         currency: mainOperation ? mainOperation.currency : 'USD',
+        formattedPrice: mainOperation?.formatted_amount || '',
+        priceUnit: mainOperation?.unit || 'total',
         operationType: (mainOperation?.type === 'rental' ? 'rental' : 'sale') as 'sale' | 'rental',
+        propertyType: data.property_type || 'Propiedad',
         latitude: typeof data.location === 'object' ? data.location?.latitude : undefined,
         longitude: typeof data.location === 'object' ? data.location?.longitude : undefined,
         bedrooms: data.bedrooms || 0,
         bathrooms: data.bathrooms || 0,
+        parking: data.parking_spaces || 0,
         area: data.construction_size || 0,
         imageUrl: data.title_image_full || data.images?.[0]?.url || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80',
         description: data.description || '',
@@ -165,6 +173,7 @@ function getMockProperties() {
             price: 4500000,
             currency: 'USD',
             operationType: 'sale' as const,
+            propertyType: 'Casa',
             bedrooms: 5,
             bathrooms: 4.5,
             area: 600,
@@ -179,6 +188,7 @@ function getMockProperties() {
             price: 2100000,
             currency: 'USD',
             operationType: 'sale' as const,
+            propertyType: 'Casa',
             bedrooms: 3,
             bathrooms: 3,
             area: 320,
@@ -193,6 +203,7 @@ function getMockProperties() {
             price: 8900000,
             currency: 'USD',
             operationType: 'sale' as const,
+            propertyType: 'Apartamento',
             bedrooms: 4,
             bathrooms: 5,
             area: 850,

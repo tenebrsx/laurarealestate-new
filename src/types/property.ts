@@ -4,11 +4,15 @@ export interface Property {
     location: string;
     price: number;
     currency: string;
+    formattedPrice?: string;
+    priceUnit?: string;
     operationType: 'sale' | 'rental';
+    propertyType: string;
     latitude?: number;
     longitude?: number;
     bedrooms: number;
     bathrooms: number;
+    parking?: number;
     area: number;
     imageUrl: string;
     description?: string;

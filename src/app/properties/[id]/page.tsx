@@ -18,12 +18,20 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         notFound();
     }
 
-    // Format price
-    const formattedPrice = new Intl.NumberFormat('en-US', {
+    const isTerreno = property.propertyType?.toLowerCase().includes('terreno') || property.propertyType?.toLowerCase().includes('solar');
+
+    // Format price - ensure Currency is visible and /m2 if applicable
+    const basePriceStr = property.formattedPrice || new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: property.currency,
         maximumFractionDigits: 0,
     }).format(property.price);
+
+    const currencySuffix = (property.formattedPrice && property.formattedPrice.includes(property.currency)) ? '' : ` ${property.currency}`;
+    const mt2Suffix = property.priceUnit && property.priceUnit.includes('meter') ? ' /m²' : '';
+    const rentalSuffix = property.operationType === 'rental' && !mt2Suffix ? '/mes' : '';
+
+    const finalPriceDisplay = `${basePriceStr}${currencySuffix}${mt2Suffix}${rentalSuffix}`;
 
     return (
         <div className="property-detail-page">
@@ -35,7 +43,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 <div className="container detail-hero-content animate-fade-in">
                     <div className="property-tags">
                         <span className="tag">{property.operationType === 'rental' ? 'En Alquiler' : 'En Venta'}</span>
-                        <span className="tag-price">{formattedPrice}{property.operationType === 'rental' ? '/mes' : ''}</span>
+                        <span className="tag-price">{finalPriceDisplay}</span>
                     </div>
                     <h1 className="detail-title">{property.title}</h1>
                     <p className="detail-location">
@@ -54,14 +62,24 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
                         {/* Key Metrics Ribbon */}
                         <div className="metrics-ribbon glass-panel">
-                            <div className="metric-box">
-                                <span className="box-value">{property.bedrooms}</span>
-                                <span className="box-label">Habitaciones</span>
-                            </div>
-                            <div className="metric-box">
-                                <span className="box-value">{property.bathrooms}</span>
-                                <span className="box-label">Baños</span>
-                            </div>
+                            {!isTerreno && (
+                                <>
+                                    <div className="metric-box">
+                                        <span className="box-value">{property.bedrooms}</span>
+                                        <span className="box-label">Habitaciones</span>
+                                    </div>
+                                    <div className="metric-box">
+                                        <span className="box-value">{property.bathrooms}</span>
+                                        <span className="box-label">Baños</span>
+                                    </div>
+                                    {property.parking !== undefined && property.parking > 0 && (
+                                        <div className="metric-box">
+                                            <span className="box-value">{property.parking}</span>
+                                            <span className="box-label">Parqueos</span>
+                                        </div>
+                                    )}
+                                </>
+                            )}
                             <div className="metric-box">
                                 <span className="box-value">{property.area}</span>
                                 <span className="box-label">Metros Cuadrados</span>
