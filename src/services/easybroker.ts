@@ -60,7 +60,12 @@ export interface FilterParams {
     location?: string;
     min_price?: number;
     max_price?: number;
+    currency?: string;
     operation_type?: 'sale' | 'rental';
+    bedrooms?: string;
+    bathrooms?: string;
+    min_area?: string;
+    max_area?: string;
 }
 
 export async function getProperties(limit = 20, page = 1, filters?: FilterParams) {
@@ -82,6 +87,13 @@ export async function getProperties(limit = 20, page = 1, filters?: FilterParams
             if (filters.operation_type) url += `&search[operations][]=${encodeURIComponent(filters.operation_type)}`;
             if (filters.min_price) url += `&search[min_price]=${filters.min_price}`;
             if (filters.max_price) url += `&search[max_price]=${filters.max_price}`;
+            if (filters.currency) url += `&search[currency]=${encodeURIComponent(filters.currency)}`;
+            if (filters.bedrooms) url += `&search[bedrooms]=${filters.bedrooms}`;
+            if (filters.bathrooms) url += `&search[bathrooms]=${filters.bathrooms}`;
+
+            // Note: EasyBroker API uses min_construction_size/max_construction_size for area metrics
+            if (filters.min_area) url += `&search[min_construction_size]=${filters.min_area}`;
+            if (filters.max_area) url += `&search[max_construction_size]=${filters.max_area}`;
         }
 
         const res = await fetch(url, {

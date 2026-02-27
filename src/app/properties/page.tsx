@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import PropertyCard from '@/components/properties/PropertyCard';
-import PropertiesFilterBar from '@/components/properties/PropertiesFilterBar';
+import PropertiesFilterWrapper from '@/components/properties/PropertiesFilterWrapper';
 import { getProperties } from '@/services/easybroker';
 import { Property } from '@/types/property';
 import './properties.css';
@@ -11,6 +11,13 @@ interface PropertiesPageProps {
         property_type?: string;
         location?: string;
         operation_type?: 'sale' | 'rental';
+        min_price?: number;
+        max_price?: number;
+        currency?: string;
+        bedrooms?: string;
+        bathrooms?: string;
+        min_area?: string;
+        max_area?: string;
     }>;
 }
 
@@ -23,6 +30,13 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
     if (params.property_type) filters.property_type = params.property_type;
     if (params.location) filters.location = params.location;
     if (params.operation_type) filters.operation_type = params.operation_type;
+    if (params.min_price) filters.min_price = params.min_price;
+    if (params.max_price) filters.max_price = params.max_price;
+    if (params.currency) filters.currency = params.currency;
+    if (params.bedrooms) filters.bedrooms = params.bedrooms;
+    if (params.bathrooms) filters.bathrooms = params.bathrooms;
+    if (params.min_area) filters.min_area = params.min_area;
+    if (params.max_area) filters.max_area = params.max_area;
 
     const { properties, pagination } = await getProperties(20, currentPage, filters);
 
@@ -33,6 +47,13 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
         if (filters.property_type) query.set('property_type', filters.property_type);
         if (filters.location) query.set('location', filters.location);
         if (filters.operation_type) query.set('operation_type', filters.operation_type);
+        if (filters.min_price) query.set('min_price', String(filters.min_price));
+        if (filters.max_price) query.set('max_price', String(filters.max_price));
+        if (filters.currency) query.set('currency', filters.currency);
+        if (filters.bedrooms) query.set('bedrooms', filters.bedrooms);
+        if (filters.bathrooms) query.set('bathrooms', filters.bathrooms);
+        if (filters.min_area) query.set('min_area', filters.min_area);
+        if (filters.max_area) query.set('max_area', filters.max_area);
         return `/properties?${query.toString()}`;
     };
 
@@ -40,7 +61,8 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
         <div className="properties-page">
             <div className="container" style={{ paddingTop: 'var(--space-2xl)' }}>
 
-                <PropertiesFilterBar />
+                {/* Advanced Filtering Trigger */}
+                <PropertiesFilterWrapper />
 
                 {/* Results count */}
                 <div className="results-header">
