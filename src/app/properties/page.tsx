@@ -1,25 +1,53 @@
 import Link from 'next/link';
 import PropertyCard from '@/components/properties/PropertyCard';
+import PropertiesFilterBar from '@/components/properties/PropertiesFilterBar';
 import { getProperties } from '@/services/easybroker';
 import { Property } from '@/types/property';
 import './properties.css';
 
 interface PropertiesPageProps {
-    searchParams: Promise<{ page?: string }>;
+    searchParams: Promise<{
+        page?: string;
+        property_type?: string;
+        location?: string;
+        operation_type?: 'sale' | 'rental';
+    }>;
 }
 
 export default async function PropertiesPage({ searchParams }: PropertiesPageProps) {
     const params = await searchParams;
     const currentPage = Number(params.page) || 1;
-    const { properties, pagination } = await getProperties(20, currentPage);
+
+    // Construct filters from URL params
+    const filters: any = {};
+    if (params.property_type) filters.property_type = params.property_type;
+    if (params.location) filters.location = params.location;
+    if (params.operation_type) filters.operation_type = params.operation_type;
+
+    const { properties, pagination } = await getProperties(20, currentPage, filters);
+
+    // Helper for pagination links to preserve filters
+    const createPageUrl = (pageNumber: number) => {
+        const query = new URLSearchParams();
+        query.set('page', pageNumber.toString());
+        if (filters.property_type) query.set('property_type', filters.property_type);
+        if (filters.location) query.set('location', filters.location);
+        if (filters.operation_type) query.set('operation_type', filters.operation_type);
+        return `/properties?${query.toString()}`;
+    };
 
     return (
         <div className="properties-page">
             <div className="container" style={{ paddingTop: 'var(--space-2xl)' }}>
+
+                <PropertiesFilterBar />
+
                 {/* Results count */}
-                <p className="results-count">
-                    {pagination.total} propiedades encontradas
-                </p>
+                <div className="results-header">
+                    <p className="results-count">
+                        {pagination.total} propiedades encontradas
+                    </p>
+                </div>
 
                 <div className="properties-grid animate-fade-in">
                     {properties.map((property: Property) => (
@@ -32,7 +60,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
                     <nav className="pagination" aria-label="Paginación">
                         {currentPage > 1 ? (
                             <Link
-                                href={`/properties?page=${currentPage - 1}`}
+                                href={createPageUrl(currentPage - 1)}
                                 className="pagination-btn"
                             >
                                 ← Anterior
@@ -48,7 +76,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
                                 ) : (
                                     <Link
                                         key={pageNum}
-                                        href={`/properties?page=${pageNum}`}
+                                        href={createPageUrl(Number(pageNum))}
                                         className={`pagination-page ${Number(pageNum) === currentPage ? 'active' : ''}`}
                                     >
                                         {pageNum}
@@ -59,7 +87,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
 
                         {currentPage < pagination.totalPages ? (
                             <Link
-                                href={`/properties?page=${currentPage + 1}`}
+                                href={createPageUrl(currentPage + 1)}
                                 className="pagination-btn"
                             >
                                 Siguiente →

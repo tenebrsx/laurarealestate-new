@@ -55,7 +55,15 @@ export function mapPropertyData(data: EasyBrokerProperty) {
     };
 }
 
-export async function getProperties(limit = 20, page = 1) {
+export interface FilterParams {
+    property_type?: string;
+    location?: string;
+    min_price?: number;
+    max_price?: number;
+    operation_type?: 'sale' | 'rental';
+}
+
+export async function getProperties(limit = 20, page = 1, filters?: FilterParams) {
     const apiKey = process.env.EASYBROKER_API_KEY;
 
     // If no API key, return mock data to prevent build crashing during demo
@@ -65,7 +73,18 @@ export async function getProperties(limit = 20, page = 1) {
     }
 
     try {
-        const res = await fetch(`https://api.easybroker.com/v1/properties?page=${page}&limit=${limit}`, {
+        let url = `https://api.easybroker.com/v1/properties?page=${page}&limit=${limit}`;
+
+        // Append filters dynamically if they exist
+        if (filters) {
+            if (filters.property_type) url += `&search[property_types][]=${encodeURIComponent(filters.property_type)}`;
+            if (filters.location) url += `&search[locations][]=${encodeURIComponent(filters.location)}`;
+            if (filters.operation_type) url += `&search[operations][]=${encodeURIComponent(filters.operation_type)}`;
+            if (filters.min_price) url += `&search[min_price]=${filters.min_price}`;
+            if (filters.max_price) url += `&search[max_price]=${filters.max_price}`;
+        }
+
+        const res = await fetch(url, {
             headers: {
                 'X-Authorization': apiKey,
                 'Content-Type': 'application/json',

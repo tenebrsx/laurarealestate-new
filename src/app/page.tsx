@@ -1,6 +1,10 @@
 import PropertyCard from '@/components/properties/PropertyCard';
 import { getProperties } from '@/services/easybroker';
 import { Property } from '@/types/property';
+import Link from 'next/link';
+import HeroSearch from '@/components/home/HeroSearch';
+import './home.css';
+import { Property } from '@/types/property';
 import './home.css';
 
 export default async function Home() {
@@ -25,10 +29,7 @@ export default async function Home() {
 
           {/* Quick Search Glass Panel directly in Hero */}
           <div className="search-panel glass-panel" style={{ marginTop: 'var(--space-2xl)', maxWidth: '800px' }}>
-            <div className="search-inputs">
-              <input type="text" placeholder="Buscar por Zona (ej. Evaristo Morales, Piantini)..." className="search-input" />
-              <button className="btn-search">Buscar Propiedad</button>
-            </div>
+            <HeroSearch />
           </div>
         </div>
       </section>
@@ -39,10 +40,21 @@ export default async function Home() {
           ¿Qué estás buscando?
         </h2>
         <div className="categories-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 'var(--space-md)' }}>
-          {['Apartamentos', 'Casas', 'Penthouse', 'Locales Comerciales', 'Solares'].map((category) => (
-            <div key={category} className="category-pill glass-panel" style={{ textAlign: 'center', padding: 'var(--space-md)', borderRadius: 'var(--radius-full)', cursor: 'pointer', border: '1px solid var(--border-color)', transition: 'all 0.3s ease' }}>
-              <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{category}</span>
-            </div>
+          {[
+            { label: 'Apartamentos', type: 'Apartamento' },
+            { label: 'Casas', type: 'Casa' },
+            { label: 'Penthouse', type: 'Penthouse' },
+            { label: 'Locales Comerciales', type: 'Local Comercial' },
+            { label: 'Solares', type: 'Terreno' }
+          ].map((category) => (
+            <Link
+              href={`/properties?property_type=${encodeURIComponent(category.type)}`}
+              key={category.label}
+              className="category-pill glass-panel"
+              style={{ textDecoration: 'none', textAlign: 'center', padding: 'var(--space-md)', borderRadius: 'var(--radius-full)', cursor: 'pointer', border: '1px solid var(--border-color)', transition: 'all 0.3s ease' }}
+            >
+              <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{category.label}</span>
+            </Link>
           ))}
         </div>
       </section>
@@ -54,10 +66,15 @@ export default async function Home() {
         </h2>
         <div className="zones-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 'var(--space-lg)' }}>
           {['Piantini', 'Naco', 'Evaristo Morales', 'Bella Vista', 'Los Cacicazgos', 'Arroyo Hondo'].map((zone) => (
-            <div key={zone} className="zone-card glass-panel" style={{ padding: 'var(--space-xl)', textAlign: 'center', cursor: 'pointer', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', transition: 'all 0.3s ease' }}>
-              <h3 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)' }}>{zone}</h3>
+            <Link
+              href={`/properties?location=${encodeURIComponent(zone)}`}
+              key={zone}
+              className="zone-card glass-panel"
+              style={{ textDecoration: 'none', padding: 'var(--space-xl)', textAlign: 'center', cursor: 'pointer', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', transition: 'all 0.3s ease' }}
+            >
+              <h3 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', margin: '0' }}>{zone}</h3>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: 'var(--space-xs)' }}>Explorar zona →</p>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
