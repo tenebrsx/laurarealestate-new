@@ -185,16 +185,7 @@
     margin: 0;
 }
 
-/* Leaflet dark mode overrides */
-@media (prefers-color-scheme: dark) {
-
-    .leaflet-layer,
-    .leaflet-control-zoom-in,
-    .leaflet-control-zoom-out,
-    .leaflet-control-attribution {
-        filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-    }
-}
+/* Leaflet dark mode overrides removed as per user request to keep light mode map */
 
 /* Responsive */
 @media (max-width: 768px) {
