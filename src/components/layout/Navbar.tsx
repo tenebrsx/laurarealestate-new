@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import ThemeToggle from '@/components/ThemeToggle';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -40,6 +41,7 @@ export default function Navbar() {
         </div>
 
         <div className="nav-actions">
+          <ThemeToggle />
           <button className="btn-contact">Contactar Agente</button>
 
           <button
