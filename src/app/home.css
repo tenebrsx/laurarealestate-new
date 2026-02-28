@@ -301,3 +301,46 @@
 .zone-card:hover h3 {
     color: var(--accent-primary) !important;
 }
+
+/* ========= LIGHT MODE OVERRIDES ========= */
+[data-theme='light'] .hero-overlay {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.5) 55%, rgba(255, 255, 255, 0.1) 100%);
+}
+
+[data-theme='light'] .hero-title,
+[data-theme='light'] .hero-description {
+    color: #121212;
+}
+
+[data-theme='light'] .hero-subtitle {
+    color: #495057;
+}
+
+[data-theme='light'] .intro-section {
+    background-color: #f8f9fa;
+}
+
+[data-theme='light'] .section-title {
+    color: #121212;
+}
+
+[data-theme='light'] .section-title .text-gradient {
+    background: linear-gradient(to right, #121212, #495057);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+[data-theme='light'] .btn-outline {
+    color: #121212;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+[data-theme='light'] .btn-outline:hover {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+[data-theme='light'] .zone-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}

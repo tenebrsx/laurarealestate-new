@@ -322,3 +322,31 @@
         gap: var(--space-md);
     }
 }
+
+/* ========= LIGHT MODE OVERRIDES ========= */
+[data-theme='light'] .hero-gradient-bottom {
+    background: linear-gradient(to top, #ffffff 0%, transparent 100%);
+}
+
+[data-theme='light'] .metrics-ribbon {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='light'] .contact-card.sticky {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='light'] .tag-price {
+    color: #ffffff;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='light'] .detail-title {
+    color: #ffffff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='light'] .detail-location {
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}

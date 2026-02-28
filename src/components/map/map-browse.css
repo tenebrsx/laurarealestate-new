@@ -243,3 +243,26 @@
     transform: scale(1.1);
     z-index: 1000;
 }
+
+/* ========= LIGHT MODE OVERRIDES ========= */
+[data-theme='light'] .price-bubble {
+    background: #ffffff;
+    color: #121212;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='light'] .price-bubble:hover {
+    background: #121212;
+    color: #ffffff;
+}
+
+[data-theme='light'] .leaflet-popup-content-wrapper {
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='light'] .map-sidebar {
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.03);
+}
