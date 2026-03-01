@@ -4,92 +4,158 @@ import { Property } from '@/types/property';
 import Link from 'next/link';
 import HeroSearch from '@/components/home/HeroSearch';
 import './home.css';
-import { Property } from '@/types/property';
-import './home.css';
+
+const categories = [
+  { label: 'Apartamentos de Diseño', type: 'Apartamento', image: '/images/categories/apartamentos.png' },
+  { label: 'Residencias Exclusivas', type: 'Casa', image: '/images/categories/casas.png' },
+  { label: 'Penthouses con Vista', type: 'Penthouse', image: '/images/categories/penthouse.png' },
+  { label: 'Solares e Inversiones', type: 'Terreno', image: '/images/categories/terrenos.png' },
+  { label: 'Espacios Comerciales', type: 'Local Comercial', image: '/images/categories/comercial.png' },
+];
+
+const zones = [
+  { name: 'Piantini', desc: 'El corazón financiero y residencial' },
+  { name: 'Naco', desc: 'Vida urbana con carácter' },
+  { name: 'Evaristo Morales', desc: 'Conectividad y modernidad' },
+  { name: 'Bella Vista', desc: 'Elegancia tradicional' },
+  { name: 'Los Cacicazgos', desc: 'Exclusividad y privacidad' },
+  { name: 'Arroyo Hondo', desc: 'Naturaleza y amplitud' },
+];
+
+const trustPoints = [
+  {
+    icon: '🏆',
+    title: 'Experiencia Personal',
+    description: 'Cada cliente recibe atención directa de Laura Alba, corredora con más de 15 años en el mercado inmobiliario dominicano.',
+  },
+  {
+    icon: '🔑',
+    title: 'Propiedades Verificadas',
+    description: 'Todas nuestras propiedades son visitadas y verificadas personalmente. Sin sorpresas, sin decepciones.',
+  },
+  {
+    icon: '📍',
+    title: 'Conocimiento Local',
+    description: 'Especialistas en las zonas más exclusivas de Santo Domingo. Te guiamos hacia la mejor inversión.',
+  },
+];
 
 export default async function Home() {
-  // Fetch featured properties directly on the server
-  const { properties: featuredProperties } = await getProperties(6);
+  const { properties: featuredProperties } = await getProperties(8);
+
   return (
     <div className="home-wrapper">
 
-      {/* Functional Hero Section */}
+      {/* ===== 1. HERO SECTION ===== */}
       <section className="hero-section">
         <div className="hero-overlay"></div>
         <div className="container hero-content animate-fade-in">
           <div className="hero-text-wrapper">
+            <span className="hero-subtitle">Bienes Raíces Exclusivos en Santo Domingo</span>
             <h1 className="hero-title">
-              Encuentra tu próximo <br />
-              <span className="text-gradient">gran espacio</span>
+              Tu próximo gran espacio <br />
+              <span className="text-gradient">te espera aquí</span>
             </h1>
             <p className="hero-description">
-              Explora las mejores propiedades en Santo Domingo, seleccionadas por su diseño y ubicación premium.
+              Propiedades seleccionadas por su diseño, ubicación y potencial de inversión.
             </p>
           </div>
-
-          {/* Quick Search Glass Panel directly in Hero */}
-          <div className="search-panel glass-panel" style={{ marginTop: 'var(--space-2xl)', maxWidth: '800px' }}>
+          <div className="search-panel glass-panel">
             <HeroSearch />
           </div>
         </div>
       </section>
 
-      {/* Property Categories / Types */}
-      <section className="categories-section container" style={{ paddingTop: 'var(--space-4xl)', paddingBottom: 'var(--space-xl)' }}>
-        <h2 style={{ fontSize: '2rem', marginBottom: 'var(--space-xl)', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>
-          ¿Qué estás buscando?
-        </h2>
-        <div className="categories-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 'var(--space-md)' }}>
-          {[
-            { label: 'Apartamentos', type: 'Apartamento' },
-            { label: 'Casas', type: 'Casa' },
-            { label: 'Penthouse', type: 'Penthouse' },
-            { label: 'Locales Comerciales', type: 'Local Comercial' },
-            { label: 'Solares', type: 'Terreno' }
-          ].map((category) => (
+      {/* ===== 2. LIFESTYLE CATEGORY CARDS ===== */}
+      <section className="categories-section container">
+        <div className="section-header">
+          <span className="section-eyebrow">Explora</span>
+          <h2 className="home-section-title">¿Qué estás buscando?</h2>
+        </div>
+        <div className="lifestyle-grid">
+          {categories.map((cat) => (
             <Link
-              href={`/properties?property_type=${encodeURIComponent(category.type)}`}
-              key={category.label}
-              className="category-pill glass-panel"
-              style={{ textDecoration: 'none', textAlign: 'center', padding: 'var(--space-md)', borderRadius: 'var(--radius-full)', cursor: 'pointer', border: '1px solid var(--border-color)', transition: 'all 0.3s ease' }}
+              href={`/properties?property_type=${encodeURIComponent(cat.type)}`}
+              key={cat.label}
+              className="lifestyle-card"
             >
-              <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{category.label}</span>
+              <div className="lifestyle-card-bg" style={{ backgroundImage: `url(${cat.image})` }}></div>
+              <div className="lifestyle-card-overlay"></div>
+              <span className="lifestyle-card-label">{cat.label}</span>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Explore by Zone Section */}
-      <section className="zones-section container" style={{ paddingTop: 'var(--space-2xl)', paddingBottom: 'var(--space-2xl)' }}>
-        <h2 style={{ fontSize: '2rem', marginBottom: 'var(--space-xl)', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>
-          Zonas Exclusivas
-        </h2>
-        <div className="zones-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 'var(--space-lg)' }}>
-          {['Piantini', 'Naco', 'Evaristo Morales', 'Bella Vista', 'Los Cacicazgos', 'Arroyo Hondo'].map((zone) => (
-            <Link
-              href={`/properties?location=${encodeURIComponent(zone)}`}
-              key={zone}
-              className="zone-card glass-panel"
-              style={{ textDecoration: 'none', padding: 'var(--space-xl)', textAlign: 'center', cursor: 'pointer', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', transition: 'all 0.3s ease' }}
-            >
-              <h3 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', margin: '0' }}>{zone}</h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: 'var(--space-xs)' }}>Explorar zona →</p>
-            </Link>
-          ))}
+      {/* ===== 3. FEATURED PROPERTIES CAROUSEL ===== */}
+      <section className="featured-section">
+        <div className="container">
+          <div className="section-header">
+            <span className="section-eyebrow">Portafolio</span>
+            <h2 className="home-section-title">Seleccionadas para ti</h2>
+          </div>
         </div>
-      </section>
-
-      {/* Featured Properties Section */}
-      <section className="intro-section container" style={{ paddingTop: 'var(--space-2xl)', paddingBottom: 'var(--space-4xl)', background: 'transparent' }}>
-        <h2 style={{ fontSize: '2rem', marginBottom: 'var(--space-xl)', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>
-          Propiedades Destacadas
-        </h2>
-
-        {/* Dynamic Property Grid */}
-        <div className="intro-gallery" style={{ height: 'auto' }}>
+        <div className="featured-carousel">
           {featuredProperties.map((property: Property) => (
-            <PropertyCard key={property.id} {...property} />
+            <div className="carousel-item" key={property.id}>
+              <PropertyCard {...property} />
+            </div>
           ))}
+        </div>
+        <div className="container" style={{ textAlign: 'center', marginTop: 'var(--space-2xl)' }}>
+          <Link href="/properties" className="btn-primary">Ver todas las propiedades →</Link>
+        </div>
+      </section>
+
+      {/* ===== 4. TRUST / DIFFERENTIATOR SECTION ===== */}
+      <section className="trust-section">
+        <div className="container">
+          <div className="section-header" style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto var(--space-3xl)' }}>
+            <span className="section-eyebrow">La Diferencia</span>
+            <h2 className="home-section-title">¿Por qué Laura Alba?</h2>
+            <p className="trust-intro">
+              No somos un portal de clasificados. Somos tu aliada personal en cada paso del proceso inmobiliario.
+            </p>
+          </div>
+          <div className="trust-grid">
+            {trustPoints.map((point) => (
+              <div className="trust-card" key={point.title}>
+                <span className="trust-icon">{point.icon}</span>
+                <h3 className="trust-card-title">{point.title}</h3>
+                <p className="trust-card-desc">{point.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== 5. EXCLUSIVE ZONES ===== */}
+      <section className="zones-section container">
+        <div className="section-header">
+          <span className="section-eyebrow">Ubicaciones</span>
+          <h2 className="home-section-title">Zonas Exclusivas</h2>
+        </div>
+        <div className="zones-grid">
+          {zones.map((zone) => (
+            <Link
+              href={`/properties?location=${encodeURIComponent(zone.name)}`}
+              key={zone.name}
+              className="zone-card"
+            >
+              <h3 className="zone-name">{zone.name}</h3>
+              <p className="zone-desc">{zone.desc}</p>
+              <span className="zone-arrow">→</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== 6. CTA BANNER ===== */}
+      <section className="cta-section">
+        <div className="container cta-content">
+          <h2 className="cta-title">¿Quieres vender o alquilar tu propiedad?</h2>
+          <p className="cta-desc">Agenda una consulta gratuita y descubre cómo podemos maximizar el valor de tu inversión.</p>
+          <Link href="/about" className="btn-cta">Contactar a Laura Alba →</Link>
         </div>
       </section>
     </div>
