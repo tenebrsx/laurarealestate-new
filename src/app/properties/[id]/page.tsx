@@ -96,6 +96,11 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                                     style={{ objectFit: 'cover' }}
                                     className="gallery-hero-img"
                                 />
+                                {property.images && property.images.length > 3 && (
+                                    <a href="#galeria" className="gallery-hero-overlay animate-fade-in">
+                                        <span className="overlay-text">Ver más imágenes (+{property.images.length - 3})</span>
+                                    </a>
+                                )}
                             </div>
                         </div>
                     )}
@@ -164,7 +169,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
                         {/* Photo Gallery Grid */}
                         {property.images && property.images.length > 0 && (
-                            <div className="detail-section">
+                            <div id="galeria" className="detail-section">
                                 <h2 className="section-heading">Galería</h2>
                                 <div className="photo-gallery">
                                     {property.images.map((img: string, idx: number) => (

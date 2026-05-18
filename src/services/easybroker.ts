@@ -1,5 +1,5 @@
-// EasyBroker API Integration Service
 import { Property } from "@/types/property";
+import { getOverridesStore, PropertyOverride } from "./overrides";
 
 export interface EasyBrokerImage {
     url: string;
@@ -77,7 +77,7 @@ export function cleanPropertyTitle(title: string): string {
 }
 
 // Maps EasyBroker response to our localized PropertyCard interface
-export function mapPropertyData(data: EasyBrokerProperty, preferredOperation?: 'sale' | 'rental') {
+export function mapPropertyData(data: EasyBrokerProperty, preferredOperation?: 'sale' | 'rental', override?: PropertyOverride) {
     // Select preferred operation or default to first
     let mainOperation = data.operations?.[0];
     if (preferredOperation && data.operations) {
@@ -93,26 +93,28 @@ export function mapPropertyData(data: EasyBrokerProperty, preferredOperation?: '
     const explicitImages = data.images || (data as any).property_images || [];
     const canonicalCover = explicitImages.length > 0 ? explicitImages[0].url : data.title_image_full;
 
+    const baseTitle = cleanPropertyTitle(data.title);
+
     return {
         id: data.public_id,
-        title: cleanPropertyTitle(data.title),
+        title: override?.title || baseTitle,
         location: typeof data.location === 'object' ? (data.location?.name || 'Ubicación no disponible') : (data.location || 'Ubicación no disponible'),
-        price: mainOperation ? mainOperation.amount : 0,
-        currency: mainOperation ? mainOperation.currency : 'USD',
+        price: override?.price ?? (mainOperation ? mainOperation.amount : 0),
+        currency: override?.currency || (mainOperation ? mainOperation.currency : 'USD'),
         formattedPrice: mainOperation?.formatted_amount || '',
         priceUnit: mainOperation?.unit || 'total',
-        operationType: (mainOperation?.type === 'rental' ? 'rental' : 'sale') as 'sale' | 'rental',
+        operationType: override?.operationType || ((mainOperation?.type === 'rental' ? 'rental' : 'sale') as 'sale' | 'rental'),
         operationTypes,
-        propertyType: data.property_type || 'Propiedad',
+        propertyType: override?.propertyType || data.property_type || 'Propiedad',
         latitude: typeof data.location === 'object' ? data.location?.latitude : undefined,
         longitude: typeof data.location === 'object' ? data.location?.longitude : undefined,
-        bedrooms: data.bedrooms || 0,
-        bathrooms: data.bathrooms || 0,
+        bedrooms: override?.bedrooms ?? (data.bedrooms || 0),
+        bathrooms: override?.bathrooms ?? (data.bathrooms || 0),
         parking: data.parking_spaces || 0,
-        area: data.construction_size || 0,
-        imageUrl: canonicalCover || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80',
-        description: data.description || '',
-        images: explicitImages.map(img => img.url)
+        area: override?.area ?? (data.construction_size || 0),
+        imageUrl: (override?.images && override.images.length > 0) ? override.images[0] : (canonicalCover || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80'),
+        description: override?.description || data.description || '',
+        images: override?.images || explicitImages.map(img => img.url)
     };
 }
 
@@ -169,9 +171,11 @@ export async function getProperties(limit = 20, page = 1, filters?: FilterParams
 
         const json = await res.json();
         
-        // Map raw EasyBroker properties (injecting operation preference)
+        const overrides = getOverridesStore();
+        
+        // Map raw EasyBroker properties (injecting operation preference and overrides)
         let properties = json.content.map((prop: EasyBrokerProperty) => 
-            mapPropertyData(prop, filters?.operation_type)
+            mapPropertyData(prop, filters?.operation_type, overrides[prop.public_id])
         );
 
         // --- LAYER 2: PROGRAMMATIC HARDENING LAYER ---
@@ -280,7 +284,8 @@ export async function getPropertyById(id: string): Promise<Property> {
         }
 
         const data = await res.json();
-        return mapPropertyData(data);
+        const overrides = getOverridesStore();
+        return mapPropertyData(data, undefined, overrides[data.public_id]);
     } catch (error) {
         console.error(`Error fetching property ${id}:`, error);
         return getMockProperties()[0];
