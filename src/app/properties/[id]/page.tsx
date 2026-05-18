@@ -1,6 +1,7 @@
 import { getPropertyById } from '@/services/easybroker';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import DynamicMap from '@/components/map/DynamicMap';
 import { MapPin, BedDouble, Bath, Car, Maximize2, Mail, Phone, Calendar } from 'lucide-react';
 import FavoriteButton from '@/components/properties/FavoriteButton';
@@ -97,9 +98,9 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                                     className="gallery-hero-img"
                                 />
                                 {property.images && property.images.length > 3 && (
-                                    <a href="#galeria" className="gallery-hero-overlay animate-fade-in">
+                                    <Link href={`/properties/${property.id}/gallery`} className="gallery-hero-overlay animate-fade-in">
                                         <span className="overlay-text">Ver más imágenes (+{property.images.length - 3})</span>
-                                    </a>
+                                    </Link>
                                 )}
                             </div>
                         </div>
@@ -167,26 +168,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                             </div>
                         </div>
 
-                        {/* Photo Gallery Grid */}
-                        {property.images && property.images.length > 0 && (
-                            <div id="galeria" className="detail-section">
-                                <h2 className="section-heading">Galería</h2>
-                                <div className="photo-gallery">
-                                    {property.images.map((img: string, idx: number) => (
-                                        <div key={idx} className="gallery-thumbnail glass-panel" style={{ position: 'relative' }}>
-                                            <Image 
-                                                src={img} 
-                                                alt={`${property.title} - View ${idx + 1}`} 
-                                                fill
-                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                style={{ objectFit: 'cover' }}
-                                                className="gallery-image"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+
 
                         {/* Property Map */}
                         {property.latitude && property.longitude && (
