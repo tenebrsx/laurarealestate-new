@@ -26,7 +26,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
     const currentPage = Number(params.page) || 1;
 
     // Construct filters from URL params
-    const filters: any = {};
+    const filters: Record<string, string | number> = {};
     if (params.property_type) filters.property_type = params.property_type;
     if (params.location) filters.location = params.location;
     if (params.operation_type) filters.operation_type = params.operation_type;
@@ -44,16 +44,16 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
     const createPageUrl = (pageNumber: number) => {
         const query = new URLSearchParams();
         query.set('page', pageNumber.toString());
-        if (filters.property_type) query.set('property_type', filters.property_type);
-        if (filters.location) query.set('location', filters.location);
-        if (filters.operation_type) query.set('operation_type', filters.operation_type);
+        if (filters.property_type) query.set('property_type', String(filters.property_type));
+        if (filters.location) query.set('location', String(filters.location));
+        if (filters.operation_type) query.set('operation_type', String(filters.operation_type));
         if (filters.min_price) query.set('min_price', String(filters.min_price));
         if (filters.max_price) query.set('max_price', String(filters.max_price));
-        if (filters.currency) query.set('currency', filters.currency);
-        if (filters.bedrooms) query.set('bedrooms', filters.bedrooms);
-        if (filters.bathrooms) query.set('bathrooms', filters.bathrooms);
-        if (filters.min_area) query.set('min_area', filters.min_area);
-        if (filters.max_area) query.set('max_area', filters.max_area);
+        if (filters.currency) query.set('currency', String(filters.currency));
+        if (filters.bedrooms) query.set('bedrooms', String(filters.bedrooms));
+        if (filters.bathrooms) query.set('bathrooms', String(filters.bathrooms));
+        if (filters.min_area) query.set('min_area', String(filters.min_area));
+        if (filters.max_area) query.set('max_area', String(filters.max_area));
         return `/properties?${query.toString()}`;
     };
 

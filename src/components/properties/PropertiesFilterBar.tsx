@@ -43,6 +43,7 @@ export default function PropertiesFilterBar() {
                     className="filter-select"
                     value={operationType}
                     onChange={(e) => setOperationType(e.target.value)}
+                    suppressHydrationWarning
                 >
                     <option value="">Todas</option>
                     <option value="sale">Venta</option>
@@ -57,6 +58,7 @@ export default function PropertiesFilterBar() {
                     className="filter-select"
                     value={propertyType}
                     onChange={(e) => setPropertyType(e.target.value)}
+                    suppressHydrationWarning
                 >
                     <option value="">Todos</option>
                     <option value="Apartamento">Apartamento</option>
@@ -78,13 +80,14 @@ export default function PropertiesFilterBar() {
                     className="filter-input"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
+                    suppressHydrationWarning
                 />
             </div>
 
             <div className="filter-actions">
-                <button type="submit" className="btn-filter-apply">Aplicar Filtros</button>
+                <button type="submit" className="btn btn-primary">Aplicar</button>
                 {(propertyType || operationType || location) && (
-                    <button type="button" className="btn-filter-clear" onClick={handleClearFilters}>
+                    <button type="button" className="btn btn-outline" onClick={handleClearFilters}>
                         Limpiar
                     </button>
                 )}

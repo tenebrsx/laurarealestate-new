@@ -7,6 +7,7 @@ export interface Property {
     formattedPrice?: string;
     priceUnit?: string;
     operationType: 'sale' | 'rental';
+    operationTypes?: string[];
     propertyType: string;
     latitude?: number;
     longitude?: number;

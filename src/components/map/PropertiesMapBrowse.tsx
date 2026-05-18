@@ -16,7 +16,8 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
+        const timer = setTimeout(() => setMounted(true), 0);
+        return () => clearTimeout(timer);
     }, []);
 
     const formatMapPrice = (price: number, currency: string) => {
@@ -34,10 +35,8 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
     // Filter properties that actually have coordinates
     const mappableProperties = properties.filter(p => p.latitude && p.longitude);
 
-    // Default center point (Santo Domingo roughly if no properties, else average of first few)
-    const defaultCenter: [number, number] = mappableProperties.length > 0
-        ? [mappableProperties[0].latitude!, mappableProperties[0].longitude!]
-        : [18.4861, -69.9312];
+    // Default center point (Santo Domingo roughly)
+    const defaultCenter: [number, number] = [18.4861, -69.9312];
 
     if (!mounted) return <div className="map-loading-full">Cargando mapa interactivo...</div>;
 
@@ -45,16 +44,25 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
         <div className="map-browse-container">
             <div className="map-sidebar">
                 <div className="map-sidebar-header">
-                    <h1 className="sidebar-title">Propiedades en Mapa</h1>
-                    <p className="sidebar-subtitle">Mostrando {mappableProperties.length} propiedades</p>
+                    <span className="text-eyebrow">Resultados</span>
+                    <h1 className="sidebar-title">Propiedades</h1>
+                    <p className="sidebar-subtitle">Mostrando {mappableProperties.length} en mapa</p>
                 </div>
                 <div className="map-property-list">
                     {mappableProperties.map(property => (
                         <Link href={`/properties/${property.id}`} key={property.id} className="map-sidebar-card">
-                            <div className="card-img" style={{ backgroundImage: `url(${property.imageUrl})` }}></div>
+                            <div className="card-img" style={{ backgroundImage: `url(${property.imageUrl})` }}>
+                                <div className="card-badge">
+                                    {property.operationTypes && property.operationTypes.includes('sale') && property.operationTypes.includes('rental') ? (
+                                        'Alq / Vta'
+                                    ) : (
+                                        property.operationType === 'rental' ? 'Alq' : 'Vta'
+                                    )}
+                                </div>
+                            </div>
                             <div className="card-info">
                                 <h3>{property.title}</h3>
-                                <p className="price">{new Intl.NumberFormat('en-US', { style: 'currency', currency: property.currency, maximumFractionDigits: 0 }).format(property.price)} {property.operationType === 'rental' ? '/mes' : ''}</p>
+                                <p className="price">{new Intl.NumberFormat('en-US', { style: 'currency', currency: property.currency, maximumFractionDigits: 0 }).format(property.price)}</p>
                             </div>
                         </Link>
                     ))}
@@ -64,7 +72,7 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
             <div className="map-view-wrapper">
                 <MapContainer
                     center={defaultCenter}
-                    zoom={13}
+                    zoom={12}
                     scrollWheelZoom={true}
                     className="leaflet-full-map"
                 >
@@ -77,8 +85,8 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
                         const customIcon = L.divIcon({
                             className: 'custom-price-marker',
                             html: `<div class="price-bubble">${formatMapPrice(property.price, property.currency)}</div>`,
-                            iconSize: [0, 0], // Sizing is handled by CSS
-                            iconAnchor: [30, 15],
+                            iconSize: [0, 0],
+                            iconAnchor: [20, 10],
                         });
 
                         return (
@@ -91,7 +99,7 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
                                     <Link href={`/properties/${property.id}`} className="popup-link">
                                         <div className="popup-img" style={{ backgroundImage: `url(${property.imageUrl})` }}></div>
                                         <div className="popup-content">
-                                            <span className="popup-tag">{property.operationType === 'rental' ? 'Alquiler' : 'Venta'}</span>
+                                            <span className="text-eyebrow" style={{ fontSize: '0.6rem', marginBottom: '4px' }}>{property.propertyType}</span>
                                             <h4 className="popup-title">{property.title}</h4>
                                             <p className="popup-price">{new Intl.NumberFormat('en-US', { style: 'currency', currency: property.currency, maximumFractionDigits: 0 }).format(property.price)}</p>
                                         </div>

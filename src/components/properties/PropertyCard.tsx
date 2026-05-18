@@ -1,4 +1,9 @@
+'use client';
+
 import Link from 'next/link';
+import Image from 'next/image';
+import { MapPin, BedDouble, Bath, Car, Maximize2, Heart } from 'lucide-react';
+import { useFavorites } from '@/context/FavoritesContext';
 import './PropertyCard.css';
 
 interface PropertyProps {
@@ -10,6 +15,7 @@ interface PropertyProps {
     formattedPrice?: string;
     priceUnit?: string;
     operationType: 'sale' | 'rental';
+    operationTypes?: string[];
     propertyType: string;
     bedrooms: number;
     bathrooms: number;
@@ -27,6 +33,7 @@ export default function PropertyCard({
     formattedPrice,
     priceUnit,
     operationType,
+    operationTypes,
     propertyType,
     bedrooms,
     bathrooms,
@@ -34,27 +41,99 @@ export default function PropertyCard({
     area,
     imageUrl,
 }: PropertyProps) {
+    const { isFavorite, toggleFavorite } = useFavorites();
+    const active = isFavorite(id);
 
-    const isTerreno = propertyType?.toLowerCase().includes('terreno') || propertyType?.toLowerCase().includes('solar');
+    const isResidential = ['apartamento', 'casa', 'penthouse', 'villa', 'condominio', 'apartment', 'house'].some(
+        type => propertyType?.toLowerCase().includes(type)
+    );
+    const isTerreno = ['terreno', 'solar', 'land'].some(
+        type => propertyType?.toLowerCase().includes(type)
+    );
+    const isRental = operationType === 'rental';
 
-    // Format price - ensure Currency is visible and /m2 if applicable
-    const basePriceStr = formattedPrice || new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currency,
-        maximumFractionDigits: 0,
-    }).format(price);
+    let primaryPriceDisplay = '';
+    let secondaryPriceDisplay = '';
 
-    const currencySuffix = (formattedPrice && formattedPrice.includes(currency)) ? '' : ` ${currency}`;
-    const mt2Suffix = priceUnit && priceUnit.includes('meter') ? ' /m²' : '';
-    const rentalSuffix = operationType === 'rental' && !mt2Suffix ? '/mes' : '';
+    // Standard currency formatter
+    const formatValue = (val: number) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: currency,
+            maximumFractionDigits: 0,
+        }).format(val) + ` ${currency}`;
+    };
 
-    const finalPriceDisplay = `${basePriceStr}${currencySuffix}${mt2Suffix}${rentalSuffix}`;
+    if (isResidential) {
+        if (priceUnit && priceUnit.toLowerCase().includes('meter')) {
+            // Price is per m2, calculate total price
+            const calculatedTotal = price * (area || 1);
+            primaryPriceDisplay = formatValue(calculatedTotal) + (isRental ? ' / mes' : '');
+            secondaryPriceDisplay = `${formatValue(price)} / m²`;
+        } else {
+            // Price is already total
+            primaryPriceDisplay = formatValue(price) + (isRental ? ' / mes' : '');
+        }
+    } else if (isTerreno) {
+        if (priceUnit && priceUnit.toLowerCase().includes('meter')) {
+            // Maintain price per m2, show total as secondary
+            primaryPriceDisplay = `${formatValue(price)} / m²`;
+            if (area > 0) {
+                secondaryPriceDisplay = `${formatValue(price * area)} total`;
+            }
+        } else {
+            // Price is total, show per m2 as secondary
+            primaryPriceDisplay = formatValue(price);
+            if (area > 0) {
+                secondaryPriceDisplay = `${formatValue(price / area)} / m²`;
+            }
+        }
+    } else {
+        // Commercial or other listings
+        primaryPriceDisplay = formatValue(price) + (isRental ? ' / mes' : '');
+    }
+
+    // Clean titles from user-generated noise like !, *, extra spaces
+    const cleanedTitle = (() => {
+        if (!title) return '';
+        return title
+            .replace(/[!*]/g, '') // Strip ! and *
+            .replace(/\s+/g, ' ') // Collapse spaces
+            .trim();
+    })();
 
     return (
         <Link href={`/properties/${id}`} className="property-card">
             <div className="property-image-container">
-                {/* We use standard img for now to easily pull unsplash placeholders */}
-                <img src={imageUrl} alt={title} className="property-image" loading="lazy" />
+                <Image 
+                    src={imageUrl} 
+                    alt={cleanedTitle} 
+                    className="property-image" 
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    style={{ objectFit: 'cover' }}
+                />
+                <div className="property-badge-container">
+                    {operationTypes && operationTypes.includes('sale') && operationTypes.includes('rental') ? (
+                        <span className="property-badge both">Venta / Alquiler</span>
+                    ) : (
+                        <span className="property-badge">{operationType === 'rental' ? 'Alquiler' : 'Venta'}</span>
+                    )}
+                    <span className="property-badge-category">{propertyType}</span>
+                </div>
+                
+                <button 
+                    className={`favorite-btn ${active ? 'active' : ''}`}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleFavorite({ id, title, price, currency, imageUrl, location, operationType });
+                    }}
+                    aria-label={active ? "Quitar de favoritos" : "Guardar en favoritos"}
+                >
+                    <Heart size={20} fill={active ? "var(--accent-primary)" : "transparent"} stroke={active ? "var(--accent-primary)" : "white"} />
+                </button>
+
                 <div className="property-overlay">
                     <span className="view-btn">Ver Detalles</span>
                 </div>
@@ -62,9 +141,9 @@ export default function PropertyCard({
 
             <div className="property-details">
                 <div className="property-header">
-                    <h3 className="property-title">{title}</h3>
+                    <h3 className="property-title">{cleanedTitle}</h3>
                     <p className="property-location">
-                        <span className="icon-marker"></span>
+                        <MapPin size={14} className="icon-gold" />
                         {location}
                     </p>
                 </div>
@@ -73,31 +152,38 @@ export default function PropertyCard({
                     {!isTerreno && (
                         <>
                             <div className="metric">
+                                <BedDouble size={16} />
                                 <span className="metric-value">{bedrooms}</span>
-                                <span className="metric-label">Hab</span>
                             </div>
                             <div className="metric">
+                                <Bath size={16} />
                                 <span className="metric-value">{bathrooms}</span>
-                                <span className="metric-label">Baños</span>
                             </div>
                             {parking !== undefined && parking > 0 && (
                                 <div className="metric">
+                                    <Car size={16} />
                                     <span className="metric-value">{parking}</span>
-                                    <span className="metric-label">Parqueos</span>
                                 </div>
                             )}
                         </>
                     )}
                     <div className="metric last-metric">
-                        <span className="metric-value">{area}</span>
-                        <span className="metric-label">m²</span>
+                        <Maximize2 size={16} />
+                        <span className="metric-value">{area} m²</span>
                     </div>
                 </div>
 
                 <div className="property-footer">
-                    <span className="property-price">
-                        {finalPriceDisplay}
-                    </span>
+                    <div className="price-wrapper" style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span className="property-price">
+                            {primaryPriceDisplay}
+                        </span>
+                        {secondaryPriceDisplay && (
+                            <span className="property-price-secondary" style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 500, marginTop: '2px' }}>
+                                {secondaryPriceDisplay}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
         </Link>

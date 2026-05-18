@@ -27,7 +27,7 @@ interface MapBrowsePageProps {
 export default async function MapBrowsePage({ searchParams }: MapBrowsePageProps) {
     const params = await searchParams;
 
-    const filters: any = {};
+    const filters: Record<string, string | number> = {};
     if (params.property_type) filters.property_type = params.property_type;
     if (params.location) filters.location = params.location;
     // Map view defaults to 'sale' if no operation_type is provided.

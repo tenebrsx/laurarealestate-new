@@ -3,6 +3,7 @@ import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { FavoritesProvider } from '@/context/FavoritesContext';
 
 export const metadata: Metadata = {
   title: 'Laura Alba | Bienes Raíces Exclusivos',
@@ -17,10 +18,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider attribute="data-theme" defaultTheme="dark">
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
+        <ThemeProvider attribute="data-theme" defaultTheme="light" forcedTheme="light">
+          <FavoritesProvider>
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+          </FavoritesProvider>
         </ThemeProvider>
       </body>
     </html>

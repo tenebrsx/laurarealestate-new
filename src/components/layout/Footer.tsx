@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { Mail, Phone, MapPin, Instagram, Linkedin } from 'lucide-react';
 import './Footer.css';
 
 export default function Footer() {
@@ -6,6 +9,13 @@ export default function Footer() {
 
     return (
         <footer className="footer">
+            <div className="footer-mini-cta">
+                <div className="container footer-mini-cta-container">
+                    <p>¿Quieres vender o alquilar tu propiedad?</p>
+                    <Link href="/about" className="footer-btn-cta">Contáctanos</Link>
+                </div>
+            </div>
+
             <div className="container footer-content">
                 <div className="footer-brand">
                     <Link href="/" className="footer-logo">
@@ -27,15 +37,25 @@ export default function Footer() {
 
                     <div className="footer-column">
                         <h4>Contacto</h4>
-                        <p className="footer-contact-item">info@lauraalba.com</p>
-                        <p className="footer-contact-item">+1 (809) 299-7077</p>
-                        <p className="footer-contact-item">Santo Domingo, D.N.</p>
+                        <a href="mailto:info@lauraalba.com" className="footer-contact-item">
+                            <Mail size={16} /> info@lauraalba.com
+                        </a>
+                        <a href="tel:+18092997077" className="footer-contact-item">
+                            <Phone size={16} /> +1 (809) 299-7077
+                        </a>
+                        <p className="footer-contact-item">
+                            <MapPin size={16} /> Santo Domingo, D.N.
+                        </p>
                     </div>
 
                     <div className="footer-column">
                         <h4>Síguenos</h4>
-                        <a href="https://www.instagram.com/lauraalba_realestate/?hl=en" target="_blank" rel="noopener noreferrer">Instagram</a>
-                        <a href="https://do.linkedin.com/in/laura-alba-04738361" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                        <a href="https://www.instagram.com/lauraalba_realestate/?hl=en" target="_blank" rel="noopener noreferrer" className="footer-social-link">
+                            <Instagram size={18} /> Instagram
+                        </a>
+                        <a href="https://do.linkedin.com/in/laura-alba-04738361" target="_blank" rel="noopener noreferrer" className="footer-social-link">
+                            <Linkedin size={18} /> LinkedIn
+                        </a>
                     </div>
                 </div>
             </div>

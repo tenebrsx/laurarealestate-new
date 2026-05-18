@@ -36,20 +36,73 @@ export interface EasyBrokerProperty {
     description?: string;
 }
 
+// Programmatically cleans and normalizes title casing and redundant transaction tags
+export function cleanPropertyTitle(title: string): string {
+    if (!title) return '';
+
+    let cleaned = title.trim();
+
+    // 1. Detect if entire title is all-caps: "APARTAMENTO EN NACO" -> Title Case: "Apartamento En Naco"
+    if (cleaned === cleaned.toUpperCase()) {
+        cleaned = cleaned.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    // 2. Remove redundant transaction action prefixes at the start (e.g., "Vendo", "Alquilo", "En venta")
+    // This matches leading keywords including combinations like "Alquiler o Venta", "Vendo o Alquilo", "O Venta", "O Alquiler"
+    const prefixRegex = /^(alquiler\s*y\s*venta|venta\s*y\s*alquiler|alquiler\s*o\s*venta|venta\s*o\s*alquiler|vendo\s*y\s*alquilo|vendo\s*y\s*rento|vendo\s*\/\s*alquilo|vendo|alquilo|se\s+vende|se\s+alquila|en\s+venta|alquiler\s+de|alquiler|o\s+venta|o\s+alquiler)\s*(?:en\s+|el\s+|la\s+|un\s+|una\s+|de\s+)?/i;
+    cleaned = cleaned.replace(prefixRegex, '');
+
+    // 3. Clean up any leftover leading punctuation or spaces (e.g. " ! Oficina" -> "Oficina")
+    cleaned = cleaned.replace(/^[\s!¡\-·•\/\\]+/, '');
+
+    // 4. Ensure the title starts with a capital letter
+    if (cleaned.length > 0) {
+        cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+    }
+
+    // 5. Normalize any individual words in all-caps (e.g. "PIANTINI" -> "Piantini", "NACO" -> "Naco")
+    // Keep common abbreviations or acronyms intact (USD, PH, etc.)
+    cleaned = cleaned.replace(/\b([A-Z]{3,})\b/g, (match) => {
+        const acronyms = ['USD', 'RD$', 'CRM', 'USA', 'PH', 'Apto', 'Apartamento'];
+        if (acronyms.includes(match)) return match;
+        return match.charAt(0) + match.slice(1).toLowerCase();
+    });
+
+    // 6. Fallback in case of over-stripping
+    if (cleaned.length < 5) {
+        return title;
+    }
+
+    return cleaned;
+}
+
 // Maps EasyBroker response to our localized PropertyCard interface
-export function mapPropertyData(data: EasyBrokerProperty) {
-    // Use the first operation for price details (usually Sale or Rent)
-    const mainOperation = data.operations?.[0];
+export function mapPropertyData(data: EasyBrokerProperty, preferredOperation?: 'sale' | 'rental') {
+    // Select preferred operation or default to first
+    let mainOperation = data.operations?.[0];
+    if (preferredOperation && data.operations) {
+        const matched = data.operations.find(op => op.type === preferredOperation);
+        if (matched) mainOperation = matched;
+    }
+
+    const operationTypes = data.operations?.map(op => op.type === 'rental' ? 'rental' : 'sale') || [];
+    
+    // EasyBroker API often caches `title_image_full` and ignores manual CRM re-ordering.
+    // By extracting the explicitly ordered `images` array first, we bypass the cache and guarantee
+    // the client's drag-and-drop placement is perfectly respected as the hero cover.
+    const explicitImages = data.images || (data as any).property_images || [];
+    const canonicalCover = explicitImages.length > 0 ? explicitImages[0].url : data.title_image_full;
 
     return {
         id: data.public_id,
-        title: data.title,
+        title: cleanPropertyTitle(data.title),
         location: typeof data.location === 'object' ? (data.location?.name || 'Ubicación no disponible') : (data.location || 'Ubicación no disponible'),
         price: mainOperation ? mainOperation.amount : 0,
         currency: mainOperation ? mainOperation.currency : 'USD',
         formattedPrice: mainOperation?.formatted_amount || '',
         priceUnit: mainOperation?.unit || 'total',
         operationType: (mainOperation?.type === 'rental' ? 'rental' : 'sale') as 'sale' | 'rental',
+        operationTypes,
         propertyType: data.property_type || 'Propiedad',
         latitude: typeof data.location === 'object' ? data.location?.latitude : undefined,
         longitude: typeof data.location === 'object' ? data.location?.longitude : undefined,
@@ -57,9 +110,9 @@ export function mapPropertyData(data: EasyBrokerProperty) {
         bathrooms: data.bathrooms || 0,
         parking: data.parking_spaces || 0,
         area: data.construction_size || 0,
-        imageUrl: data.title_image_full || data.images?.[0]?.url || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80',
+        imageUrl: canonicalCover || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80',
         description: data.description || '',
-        images: data.images?.map(img => img.url) || []
+        images: explicitImages.map(img => img.url)
     };
 }
 
@@ -85,23 +138,21 @@ export async function getProperties(limit = 20, page = 1, filters?: FilterParams
         return { properties: getMockProperties(), pagination: { total: 3, page: 1, totalPages: 1 } };
     }
 
+    // Determine if we have any active search values
+    const hasActiveFilters = !!(filters && Object.keys(filters).some(key => {
+        const val = filters[key as keyof FilterParams];
+        return val !== undefined && val !== null && val !== '';
+    }));
+
     try {
-        let url = `https://api.easybroker.com/v1/properties?page=${page}&limit=${limit}`;
+        // Fetch a larger page size (up to 50) if filtering is active to maximize candidates
+        const fetchLimit = hasActiveFilters ? Math.max(50, limit) : limit;
+        let url = `https://api.easybroker.com/v1/properties?page=${page}&limit=${fetchLimit}`;
 
-        // Append filters dynamically if they exist
-        if (filters) {
+        // Forward core search values to API only if filters are active
+        if (hasActiveFilters && filters) {
             if (filters.property_type) url += `&search[property_types][]=${encodeURIComponent(filters.property_type)}`;
-            if (filters.location) url += `&search[locations][]=${encodeURIComponent(filters.location)}`;
             if (filters.operation_type) url += `&search[operations][]=${encodeURIComponent(filters.operation_type)}`;
-            if (filters.min_price) url += `&search[min_price]=${filters.min_price}`;
-            if (filters.max_price) url += `&search[max_price]=${filters.max_price}`;
-            if (filters.currency) url += `&search[currency]=${encodeURIComponent(filters.currency)}`;
-            if (filters.bedrooms) url += `&search[bedrooms]=${filters.bedrooms}`;
-            if (filters.bathrooms) url += `&search[bathrooms]=${filters.bathrooms}`;
-
-            // Note: EasyBroker API uses min_construction_size/max_construction_size for area metrics
-            if (filters.min_area) url += `&search[min_construction_size]=${filters.min_area}`;
-            if (filters.max_area) url += `&search[max_construction_size]=${filters.max_area}`;
         }
 
         const res = await fetch(url, {
@@ -117,8 +168,81 @@ export async function getProperties(limit = 20, page = 1, filters?: FilterParams
         }
 
         const json = await res.json();
-        const properties = json.content.map(mapPropertyData);
-        const total = json.pagination?.total || properties.length;
+        
+        // Map raw EasyBroker properties (injecting operation preference)
+        let properties = json.content.map((prop: EasyBrokerProperty) => 
+            mapPropertyData(prop, filters?.operation_type)
+        );
+
+        // --- LAYER 2: PROGRAMMATIC HARDENING LAYER ---
+        if (hasActiveFilters && filters) {
+            // Location Substring Hardening
+            if (filters.location) {
+                const locQuery = filters.location.toLowerCase().trim();
+                properties = properties.filter((p: Property) => 
+                    p.location.toLowerCase().includes(locQuery)
+                );
+            }
+
+            // Operation Type Filtering
+            if (filters.operation_type) {
+                properties = properties.filter((p: Property) => 
+                    p.operationType === filters.operation_type
+                );
+            }
+
+            // Property Type Filtering
+            if (filters.property_type) {
+                const pType = filters.property_type.toLowerCase();
+                properties = properties.filter((p: Property) => 
+                    p.propertyType.toLowerCase() === pType
+                );
+            }
+
+            // Min Price
+            if (filters.min_price) {
+                const minP = Number(filters.min_price);
+                properties = properties.filter((p: Property) => p.price >= minP);
+            }
+
+            // Max Price
+            if (filters.max_price) {
+                const maxP = Number(filters.max_price);
+                properties = properties.filter((p: Property) => p.price <= maxP);
+            }
+
+            // Bedrooms count (supports '6+' mapping)
+            if (filters.bedrooms) {
+                const minBeds = parseInt(filters.bedrooms);
+                properties = properties.filter((p: Property) => p.bedrooms >= minBeds);
+            }
+
+            // Bathrooms count
+            if (filters.bathrooms) {
+                const minBaths = parseFloat(filters.bathrooms);
+                properties = properties.filter((p: Property) => p.bathrooms >= minBaths);
+            }
+
+            // Construction Area Range
+            if (filters.min_area) {
+                const minA = Number(filters.min_area);
+                properties = properties.filter((p: Property) => p.area >= minA);
+            }
+            if (filters.max_area) {
+                const maxA = Number(filters.max_area);
+                properties = properties.filter((p: Property) => p.area <= maxA);
+            }
+        }
+
+        // Adjust returned array length to target page limit size
+        const total = hasActiveFilters ? properties.length : (json.pagination?.total || properties.length);
+        
+        // Paginate the programmatically filtered subset if filters were active
+        if (hasActiveFilters && properties.length > limit) {
+            const startIdx = (page - 1) * limit;
+            properties = properties.slice(startIdx, startIdx + limit);
+        }
+
         const totalPages = Math.ceil(total / limit);
 
         return {

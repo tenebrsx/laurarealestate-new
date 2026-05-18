@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import ThemeToggle from '@/components/ThemeToggle';
+import { Heart } from 'lucide-react';
+import { useFavorites } from '@/context/FavoritesContext';
+import FavoritesDrawer from '@/components/properties/FavoritesDrawer';
 import './Navbar.css';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [favoritesOpen, setFavoritesOpen] = useState(false);
+  const { favorites } = useFavorites();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,8 +45,18 @@ export default function Navbar() {
         </div>
 
         <div className="nav-actions">
-          <ThemeToggle />
-          <button className="btn-contact">Contactar Agente</button>
+          <button 
+            className="nav-favorites-btn" 
+            onClick={() => setFavoritesOpen(true)}
+            aria-label="Ver favoritos"
+          >
+            <Heart size={20} />
+            {favorites.length > 0 && (
+                <span className="nav-favorites-badge">{favorites.length}</span>
+            )}
+          </button>
+
+          <Link href="/about" className="btn btn-primary btn-nav">Contactar</Link>
 
           <button
             className={`mobile-menu-btn ${mobileMenuOpen ? 'active' : ''}`}
@@ -63,9 +77,21 @@ export default function Navbar() {
           <Link href="/properties" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Propiedades</Link>
           <Link href="/mapa" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Mapa</Link>
           <Link href="/about" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Nosotros</Link>
-          <button className="btn-contact mobile-btn" onClick={() => setMobileMenuOpen(false)}>Contactar Agente</button>
+          <button 
+            className="mobile-nav-link" 
+            onClick={() => {
+                setMobileMenuOpen(false);
+                setFavoritesOpen(true);
+            }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center' }}
+          >
+            Favoritos ({favorites.length})
+          </button>
+          <Link href="/about" className="btn btn-primary mobile-btn" onClick={() => setMobileMenuOpen(false)}>Contactar Agente</Link>
         </div>
       </div>
+
+      <FavoritesDrawer isOpen={favoritesOpen} onClose={() => setFavoritesOpen(false)} />
     </nav>
   );
 }

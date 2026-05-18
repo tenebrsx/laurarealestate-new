@@ -13,7 +13,7 @@ export default function PropertiesFilterSidebar({ isOpen, onClose }: PropertiesF
 
     // Base Filters
     const [propertyType, setPropertyType] = useState(searchParams.get('property_type') || '');
-    const [operationType, setOperationType] = useState(searchParams.get('operation_type') || '');
+    const [operationType, setOperationType] = useState(searchParams.get('operation_type') || 'sale');
     const [location, setLocation] = useState(searchParams.get('location') || '');
 
     // Advanced Filters
@@ -121,13 +121,18 @@ export default function PropertiesFilterSidebar({ isOpen, onClose }: PropertiesF
                                     value={location}
                                     onChange={(e) => setLocation(e.target.value)}
                                     className="advanced-input"
+                                    suppressHydrationWarning
                                 />
                             </div>
 
                             <div className="filter-input-group">
                                 <label>Operación</label>
-                                <select value={operationType} onChange={(e) => setOperationType(e.target.value)} className="advanced-select">
-                                    <option value="">Todas</option>
+                                <select 
+                                    value={operationType} 
+                                    onChange={(e) => setOperationType(e.target.value)} 
+                                    className="advanced-select"
+                                    suppressHydrationWarning
+                                >
                                     <option value="sale">Venta</option>
                                     <option value="rental">Alquiler</option>
                                 </select>
@@ -135,7 +140,12 @@ export default function PropertiesFilterSidebar({ isOpen, onClose }: PropertiesF
 
                             <div className="filter-input-group">
                                 <label>Tipo de Propiedad</label>
-                                <select value={propertyType} onChange={(e) => setPropertyType(e.target.value)} className="advanced-select">
+                                <select 
+                                    value={propertyType} 
+                                    onChange={(e) => setPropertyType(e.target.value)} 
+                                    className="advanced-select"
+                                    suppressHydrationWarning
+                                >
                                     <option value="">Todos</option>
                                     <option value="Apartamento">Apartamento</option>
                                     <option value="Casa">Casa</option>
@@ -159,10 +169,29 @@ export default function PropertiesFilterSidebar({ isOpen, onClose }: PropertiesF
                                 {openSections.price && (
                                     <div className="accordion-body">
                                         <div className="range-inputs">
-                                            <input type="number" placeholder="Mínimo" value={minPrice} onChange={e => setMinPrice(e.target.value)} className="advanced-input" />
-                                            <input type="number" placeholder="Máximo" value={maxPrice} onChange={e => setMaxPrice(e.target.value)} className="advanced-input" />
+                                            <input 
+                                                type="number" 
+                                                placeholder="Mínimo" 
+                                                value={minPrice} 
+                                                onChange={e => setMinPrice(e.target.value)} 
+                                                className="advanced-input" 
+                                                suppressHydrationWarning
+                                            />
+                                            <input 
+                                                type="number" 
+                                                placeholder="Máximo" 
+                                                value={maxPrice} 
+                                                onChange={e => setMaxPrice(e.target.value)} 
+                                                className="advanced-input" 
+                                                suppressHydrationWarning
+                                            />
                                         </div>
-                                        <select value={currency} onChange={e => setCurrency(e.target.value)} className="advanced-select mt-sm">
+                                        <select 
+                                            value={currency} 
+                                            onChange={e => setCurrency(e.target.value)} 
+                                            className="advanced-select mt-sm"
+                                            suppressHydrationWarning
+                                        >
                                             <option value="USD">Dólar estadounidense (USD)</option>
                                             <option value="DOP">Peso dominicano (DOP)</option>
                                         </select>
@@ -225,8 +254,22 @@ export default function PropertiesFilterSidebar({ isOpen, onClose }: PropertiesF
                                 {openSections.area && (
                                     <div className="accordion-body">
                                         <div className="range-inputs">
-                                            <input type="number" placeholder="Mínimo" value={minArea} onChange={e => setMinArea(e.target.value)} className="advanced-input" />
-                                            <input type="number" placeholder="Máximo" value={maxArea} onChange={e => setMaxArea(e.target.value)} className="advanced-input" />
+                                            <input 
+                                                type="number" 
+                                                placeholder="Mínimo" 
+                                                value={minArea} 
+                                                onChange={e => setMinArea(e.target.value)} 
+                                                className="advanced-input" 
+                                                suppressHydrationWarning
+                                            />
+                                            <input 
+                                                type="number" 
+                                                placeholder="Máximo" 
+                                                value={maxArea} 
+                                                onChange={e => setMaxArea(e.target.value)} 
+                                                className="advanced-input" 
+                                                suppressHydrationWarning
+                                            />
                                         </div>
                                     </div>
                                 )}
