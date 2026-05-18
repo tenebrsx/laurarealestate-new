@@ -1,10 +1,8 @@
 import { getPropertyById } from '@/services/easybroker';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
 import DynamicMap from '@/components/map/DynamicMap';
 import { MapPin, BedDouble, Bath, Car, Maximize2, Mail, Phone, Calendar } from 'lucide-react';
-import FavoriteButton from '@/components/properties/FavoriteButton';
+import PropertyGalleryHero from './PropertyGalleryHero';
 import './property-detail.css';
 
 interface PageProps {
@@ -39,74 +37,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
     return (
         <div className="property-detail-page">
-            {/* Premium Asymmetric Gallery Hero (Moved to Top) */}
-            <section className="detail-gallery-hero container animate-fade-in">
-                <div className="gallery-hero-grid">
-                    {/* Main Large Image */}
-                    <div className="gallery-hero-main">
-                        {/* Floating Badges & Favorite */}
-                        <div className="hero-floating-tags">
-                            <span className="text-eyebrow" style={{ marginBottom: 0 }}>{property.propertyType}</span>
-                            {property.operationTypes && property.operationTypes.includes('sale') && property.operationTypes.includes('rental') ? (
-                                <span className="tag both">Venta / Alquiler</span>
-                            ) : (
-                                <span className="tag">{property.operationType === 'rental' ? 'Alquiler' : 'Venta'}</span>
-                            )}
-                        </div>
-                        <div className="hero-floating-favorite">
-                            <FavoriteButton property={{
-                                id: property.id,
-                                title: property.title,
-                                price: property.price,
-                                currency: property.currency,
-                                imageUrl: property.imageUrl,
-                                location: property.location,
-                                operationType: property.operationType
-                            }} />
-                        </div>
-
-                        <Image 
-                            src={property.imageUrl} 
-                            alt={property.title}
-                            fill
-                            priority
-                            sizes="(max-width: 768px) 100vw, 65vw"
-                            style={{ objectFit: 'cover' }}
-                            className="gallery-hero-img"
-                        />
-                    </div>
-                    {/* Stacked Side Images */}
-                    {property.images && property.images.length > 1 && (
-                        <div className="gallery-hero-side">
-                            <div className="gallery-hero-side-item">
-                                <Image 
-                                    src={property.images[1] || property.imageUrl} 
-                                    alt={`${property.title} - View 2`}
-                                    fill
-                                    sizes="35vw"
-                                    style={{ objectFit: 'cover' }}
-                                    className="gallery-hero-img"
-                                />
-                            </div>
-                            <div className="gallery-hero-side-item">
-                                <Image 
-                                    src={property.images[2] || property.images[0] || property.imageUrl} 
-                                    alt={`${property.title} - View 3`}
-                                    fill
-                                    sizes="35vw"
-                                    style={{ objectFit: 'cover' }}
-                                    className="gallery-hero-img"
-                                />
-                                {property.images && property.images.length > 3 && (
-                                    <Link href={`/properties/${property.id}/gallery`} className="gallery-hero-overlay animate-fade-in">
-                                        <span className="overlay-text">Ver más imágenes (+{property.images.length - 3})</span>
-                                    </Link>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </section>
+            {/* Premium Gallery Hero with Inline Expand Support */}
+            <PropertyGalleryHero property={property} />
 
             {/* Detail Header Section (Moved Below Image) */}
             <header className="detail-header-section container animate-fade-in">
