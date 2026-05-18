@@ -98,38 +98,35 @@
     color: #ffffff !important;
 }
 
-/* --- Masonry Grid Section --- */
+/* --- Dynamic Grid Section --- */
 .gallery-grid-section {
     padding-top: var(--space-2xl);
 }
 
-.gallery-masonry-grid {
-    columns: 3 360px;
-    column-gap: var(--space-md);
-    margin: 0 auto;
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+    grid-auto-flow: dense;
+    transition: all 0.5s ease;
 }
 
 .gallery-grid-item {
-    break-inside: avoid;
-    margin-bottom: var(--space-md);
+    cursor: pointer;
+    position: relative;
     border-radius: var(--radius-md);
     overflow: hidden;
     background: #ffffff;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
-    transition: all var(--transition-normal);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gallery-item-inner {
     position: relative;
     width: 100%;
     aspect-ratio: 16/10;
-    overflow: hidden;
-}
-
-/* tall aspect ratio for elegant masonry simulation */
-.gallery-grid-item.tall .gallery-item-inner {
-    aspect-ratio: 10/12;
+    transition: aspect-ratio 0.5s ease;
 }
 
 .gallery-grid-img {
@@ -144,6 +141,18 @@
 
 .gallery-grid-item:hover .gallery-grid-img {
     transform: scale(1.04);
+}
+
+/* --- Expanded Cinematic State --- */
+.gallery-grid-item.expanded {
+    grid-column: 1 / -1; /* Spans across all available columns */
+    box-shadow: var(--shadow-xl);
+    border-color: var(--accent-primary);
+    transform: none; /* Disable float lift when expanded */
+}
+
+.gallery-grid-item.expanded .gallery-item-inner {
+    aspect-ratio: 21/9; /* Dynamic cinematic banner span */
 }
 
 /* Hover overlays showing photo indexes */
@@ -178,6 +187,12 @@
 }
 
 /* --- Responsive Adaptations --- */
+@media (max-width: 1024px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 992px) {
     .gallery-header-container {
         height: auto;
@@ -198,11 +213,11 @@
 }
 
 @media (max-width: 768px) {
-    .gallery-masonry-grid {
-        columns: 1;
+    .gallery-grid {
+        grid-template-columns: 1fr;
     }
     
-    .gallery-grid-item.tall .gallery-item-inner {
-        aspect-ratio: 16/10; /* force normal aspect ratio on mobile for consistency */
+    .gallery-grid-item.expanded .gallery-item-inner {
+        aspect-ratio: 16/10; /* maintain mobile aspect ratio */
     }
 }

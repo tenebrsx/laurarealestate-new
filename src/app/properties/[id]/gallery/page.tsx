@@ -1,8 +1,8 @@
 import { getPropertyById } from '@/services/easybroker';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Mail } from 'lucide-react';
+import GalleryGrid from './GalleryGrid';
 import './gallery-page.css';
 
 interface GalleryPageProps {
@@ -53,38 +53,9 @@ export default async function PropertyGalleryPage({ params }: GalleryPageProps) 
         </div>
       </header>
 
-      {/* Main Luxury Masonry Image Grid */}
+      {/* Main Luxury Dynamic Image Grid */}
       <main className="gallery-grid-section container">
-        <div className="gallery-masonry-grid">
-          {property.images && property.images.length > 0 ? (
-            property.images.map((img: string, idx: number) => {
-              // Give some random items a tall class to simulate beautiful masonry grid
-              const isTall = idx % 5 === 1 || idx % 5 === 3;
-              return (
-                <div key={idx} className={`gallery-grid-item ${isTall ? 'tall' : ''} glass-panel`}>
-                  <div className="gallery-item-inner">
-                    <Image
-                      src={img}
-                      alt={`${property.title} - Imagen ${idx + 1}`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      style={{ objectFit: 'cover' }}
-                      className="gallery-grid-img"
-                      loading={idx < 6 ? "eager" : "lazy"}
-                    />
-                    <div className="gallery-item-overlay">
-                      <span className="gallery-item-number">{idx + 1} / {property.images.length}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="no-images-fallback">
-              <p>No hay imágenes disponibles para esta galería.</p>
-            </div>
-          )}
-        </div>
+        <GalleryGrid images={property.images || []} title={property.title} />
       </main>
     </div>
   );
