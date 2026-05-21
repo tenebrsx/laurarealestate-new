@@ -1,1 +1,13 @@
-{}
+{
+  "EB-QA9584": {
+    "price": 730000,
+    "currency": "USD",
+    "images": [
+      "https://assets.easybroker.com/property_images/4439584/83017947/EB-QA9584.jpeg?version=1732757716",
+      "https://assets.easybroker.com/property_images/4439584/74219254/EB-QA9584.jpeg?version=1732757716",
+      "https://assets.easybroker.com/property_images/4439584/83017948/EB-QA9584.jpeg?version=1732757716",
+      "https://assets.easybroker.com/property_images/4439584/83017949/EB-QA9584.jpeg?version=1732757716",
+      "https://assets.easybroker.com/property_images/4439584/83017950/EB-QA9584.jpeg?version=1732757716"
+    ]
+  }
+}

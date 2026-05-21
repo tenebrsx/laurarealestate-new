@@ -161,8 +161,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px; /* Safe default gap to prevent overlapping */
     padding-top: var(--space-md);
     border-top: 1px solid var(--border-color);
+}
+
+.price-wrapper {
+    min-width: 0;
+    flex-shrink: 1;
 }
 
 .property-price {
@@ -184,15 +190,15 @@
 /* === Mobile Spacing & Clarity Upgrades === */
 @media (max-width: 768px) {
     .property-details {
-        padding: var(--space-xl);
+        padding: 1.15rem; /* Expanded horizontal room on mobile viewports */
     }
     
     .property-header {
-        margin-bottom: var(--space-xl);
+        margin-bottom: var(--space-lg);
     }
     
     .property-title {
-        font-size: var(--text-xl);
+        font-size: var(--text-lg);
         margin-bottom: var(--space-sm);
     }
     
@@ -201,8 +207,18 @@
         gap: var(--space-sm);
     }
 
+    .property-price {
+        font-size: 1.05rem; /* Reduced to guarantee plenty of room without overlap */
+    }
+
+    .view-property-btn {
+        font-size: 0.7rem; /* Scale down button slightly on mobile */
+        gap: 2px;
+    }
+
     .property-footer {
         padding-top: var(--space-lg);
+        gap: 8px; /* Force safe gap on mobile */
     }
 }
 

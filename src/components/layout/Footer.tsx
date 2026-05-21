@@ -10,8 +10,8 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
     const pathname = usePathname();
     
-    // Completely hide footer on map browse view to make it strictly full viewport map page
-    if (pathname === '/mapa') {
+    // Completely hide footer on map browse view or admin panel to make it focused
+    if (pathname === '/mapa' || pathname?.startsWith('/admin')) {
         return null;
     }
     

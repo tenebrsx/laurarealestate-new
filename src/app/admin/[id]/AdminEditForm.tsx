@@ -7,6 +7,25 @@ import { Property } from '@/types/property';
 import { Save, Trash2, ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 import { formatCurrency } from '@/utils/format';
 
+// Robust helpers to parse flexible numeric inputs (e.g., with commas, spaces, dots)
+const parsePriceInput = (val: string): number | undefined => {
+  const cleaned = val.trim();
+  if (cleaned === '') return undefined;
+  // Remove all commas, dots, and spaces, since real estate prices/areas/rooms are integers
+  const sanitized = cleaned.replace(/[\s,.]/g, '');
+  const num = Number(sanitized);
+  return isNaN(num) ? undefined : num;
+};
+
+const parseDecimalInput = (val: string): number | undefined => {
+  const cleaned = val.trim();
+  if (cleaned === '') return undefined;
+  // Normalize Spanish comma decimal to standard dot decimal
+  const normalized = cleaned.replace(',', '.').replace(/\s/g, '');
+  const num = Number(normalized);
+  return isNaN(num) ? undefined : num;
+};
+
 interface AdminEditFormProps {
   property: Property;
   initialOverride?: PropertyOverride;
@@ -84,7 +103,7 @@ export default function AdminEditForm({ property, initialOverride }: AdminEditFo
       });
 
       if (res.ok) {
-        alert('Overrides eliminados con éxito. Se han restaurado los datos originales de EasyBroker.');
+        alert('Overrides eliminados con éxito. Redirigiendo a la página de la propiedad para verificar los cambios...');
         // Reset states to empty to fall back to EasyBroker
         setTitle('');
         setDescription('');
@@ -97,7 +116,8 @@ export default function AdminEditForm({ property, initialOverride }: AdminEditFo
         setArea('');
         setImages(property.images || []);
         
-        router.refresh();
+        // Force full browser reload and redirect to bypass Next.js client-side router cache
+        window.location.href = `/properties/${property.id}`;
       } else {
         alert('Error al intentar eliminar los overrides.');
       }
@@ -114,16 +134,21 @@ export default function AdminEditForm({ property, initialOverride }: AdminEditFo
     setIsSaving(true);
     
     try {
+      const parsedPrice = price !== '' ? parsePriceInput(price) : undefined;
+      const parsedArea = area !== '' ? parsePriceInput(area) : undefined;
+      const parsedBedrooms = bedrooms !== '' ? parsePriceInput(bedrooms) : undefined;
+      const parsedBathrooms = bathrooms !== '' ? parseDecimalInput(bathrooms) : undefined;
+
       const payload: PropertyOverride = {
         title: title.trim() || undefined,
         description: description.trim() || undefined,
-        price: price !== '' ? Number(price) : undefined,
-        currency: price !== '' ? currency : undefined,
+        price: parsedPrice,
+        currency: parsedPrice !== undefined ? currency : undefined,
         operationType: (operationType as 'sale' | 'rental') || undefined,
         propertyType: propertyType || undefined,
-        bedrooms: bedrooms !== '' ? Number(bedrooms) : undefined,
-        bathrooms: bathrooms !== '' ? Number(bathrooms) : undefined,
-        area: area !== '' ? Number(area) : undefined,
+        bedrooms: parsedBedrooms,
+        bathrooms: parsedBathrooms,
+        area: parsedArea,
         images: images.length > 0 ? images : undefined,
       };
       
@@ -134,8 +159,9 @@ export default function AdminEditForm({ property, initialOverride }: AdminEditFo
       });
       
       if (res.ok) {
-        alert('Override guardado exitosamente. La página web ahora mostrará estos datos.');
-        router.refresh();
+        alert('Override guardado exitosamente. Redirigiendo a la página de la propiedad para verificar los cambios...');
+        // Force full browser reload and redirect to bypass Next.js client-side router cache
+        window.location.href = `/properties/${property.id}`;
       } else {
         alert('Error al guardar el override.');
       }
@@ -156,6 +182,14 @@ export default function AdminEditForm({ property, initialOverride }: AdminEditFo
   const isBedroomsOverridden = bedrooms !== '';
   const isBathroomsOverridden = bathrooms !== '';
   const isImagesOverridden = JSON.stringify(images) !== JSON.stringify(property.images || []);
+
+  // Parse inputs dynamically for real-time validation & formatting preview
+  const parsedPrice = price !== '' ? parsePriceInput(price) : undefined;
+  const parsedArea = area !== '' ? parsePriceInput(area) : undefined;
+  const parsedBedrooms = bedrooms !== '' ? parsePriceInput(bedrooms) : undefined;
+  const parsedBathrooms = bathrooms !== '' ? parseDecimalInput(bathrooms) : undefined;
+
+  const pricePreview = parsedPrice !== undefined ? formatCurrency(parsedPrice, currency) : null;
 
   return (
     <form onSubmit={handleSave} className="admin-editor-wrap">
@@ -258,12 +292,22 @@ export default function AdminEditForm({ property, initialOverride }: AdminEditFo
               {isPriceOverridden && <span className="override-indicator-badge">Modificado</span>}
             </label>
             <input 
-              type="number" 
+              type="text" 
               className={`admin-input ${isPriceOverridden ? 'is-overridden' : ''}`} 
               value={price} 
               onChange={(e) => setPrice(e.target.value)} 
               placeholder={String(property.price)} 
             />
+            {pricePreview && (
+              <div className="admin-input-preview-badge">
+                ✓ Se guardará como: <strong>{pricePreview}</strong>
+              </div>
+            )}
+            {price !== '' && parsedPrice === undefined && (
+              <div className="admin-input-error-badge">
+                ⚠ El valor ingresado no es un número válido.
+              </div>
+            )}
             <span className="admin-helper-text">Original: {formatCurrency(property.price, property.currency)}</span>
           </div>
 
@@ -290,12 +334,22 @@ export default function AdminEditForm({ property, initialOverride }: AdminEditFo
               {isAreaOverridden && <span className="override-indicator-badge">Modificado</span>}
             </label>
             <input 
-              type="number" 
+              type="text" 
               className={`admin-input ${isAreaOverridden ? 'is-overridden' : ''}`} 
               value={area} 
               onChange={(e) => setArea(e.target.value)} 
               placeholder={String(property.area)} 
             />
+            {parsedArea !== undefined && (
+              <div className="admin-input-preview-badge">
+                ✓ Se guardará como: <strong>{parsedArea} m²</strong>
+              </div>
+            )}
+            {area !== '' && parsedArea === undefined && (
+              <div className="admin-input-error-badge">
+                ⚠ El valor ingresado no es un número válido.
+              </div>
+            )}
             <span className="admin-helper-text">Original: {property.area} m²</span>
           </div>
         </div>
@@ -307,12 +361,22 @@ export default function AdminEditForm({ property, initialOverride }: AdminEditFo
               {isBedroomsOverridden && <span className="override-indicator-badge">Modificado</span>}
             </label>
             <input 
-              type="number" 
+              type="text" 
               className={`admin-input ${isBedroomsOverridden ? 'is-overridden' : ''}`} 
               value={bedrooms} 
               onChange={(e) => setBedrooms(e.target.value)} 
               placeholder={String(property.bedrooms)} 
             />
+            {parsedBedrooms !== undefined && (
+              <div className="admin-input-preview-badge">
+                ✓ Se guardará como: <strong>{parsedBedrooms} hab</strong>
+              </div>
+            )}
+            {bedrooms !== '' && parsedBedrooms === undefined && (
+              <div className="admin-input-error-badge">
+                ⚠ El valor ingresado no es un número válido.
+              </div>
+            )}
             <span className="admin-helper-text">Original: {property.bedrooms}</span>
           </div>
 
@@ -322,13 +386,22 @@ export default function AdminEditForm({ property, initialOverride }: AdminEditFo
               {isBathroomsOverridden && <span className="override-indicator-badge">Modificado</span>}
             </label>
             <input 
-              type="number" 
-              step="0.5"
+              type="text" 
               className={`admin-input ${isBathroomsOverridden ? 'is-overridden' : ''}`} 
               value={bathrooms} 
               onChange={(e) => setBathrooms(e.target.value)} 
               placeholder={String(property.bathrooms)} 
             />
+            {parsedBathrooms !== undefined && (
+              <div className="admin-input-preview-badge">
+                ✓ Se guardará como: <strong>{parsedBathrooms} baños</strong>
+              </div>
+            )}
+            {bathrooms !== '' && parsedBathrooms === undefined && (
+              <div className="admin-input-error-badge">
+                ⚠ El valor ingresado no es un número válido (ej: 2.5).
+              </div>
+            )}
             <span className="admin-helper-text">Original: {property.bathrooms}</span>
           </div>
         </div>

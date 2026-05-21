@@ -15,7 +15,25 @@ const admin = getFirebaseAdmin();
 // Determine the active Firebase project ID, fallback to the default production ID
 const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || 'laura-realestate';
 
-if (admin && !admin.apps.length) {
+// Determine if we have credentials to initialize Firestore:
+// 1. In deployed environments (Firebase Cloud Functions, Cloud Run, App Hosting, Vercel etc.),
+//    Google Application Default Credentials (ADC) are automatically provided.
+// 2. In local environments, we require either GOOGLE_APPLICATION_CREDENTIALS or the Firestore Emulator.
+const isDeployed = !!(
+  process.env.FIREBASE_CONFIG ||
+  process.env.K_SERVICE ||
+  process.env.FUNCTION_NAME ||
+  process.env.GAE_SERVICE ||
+  process.env.VERCEL
+);
+const hasLocalCredentials = !!(
+  process.env.GOOGLE_APPLICATION_CREDENTIALS ||
+  process.env.FIRESTORE_EMULATOR_HOST
+);
+
+const shouldConnectToFirestore = isDeployed || hasLocalCredentials;
+
+if (admin && shouldConnectToFirestore && !admin.apps.length) {
   try {
     // In local environments, passing an explicit projectId allows admin.firestore() to initialize
     // without throwing a crash-inducing "Unable to detect a Project Id" module-load error.
@@ -30,7 +48,10 @@ if (admin && !admin.apps.length) {
 
 // Gracefully handle Firestore initialization errors on module load
 const getFirestoreDb = () => {
-  if (!admin || !admin.apps.length) return null;
+  if (!admin || !shouldConnectToFirestore || !admin.apps.length) {
+    console.warn('Firebase Firestore is disabled (missing local credentials or emulator). Falling back to local overrides.');
+    return null;
+  }
   try {
     return admin.firestore();
   } catch (error) {
@@ -40,4 +61,5 @@ const getFirestoreDb = () => {
 };
 
 export const db = getFirestoreDb();
+
 

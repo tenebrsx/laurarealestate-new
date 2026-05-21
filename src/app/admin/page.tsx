@@ -117,10 +117,18 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
                   
                   {/* Inline Metrics Ribbon */}
                   <div className="admin-card-specs">
-                    <span>🛏️ {prop.bedrooms} hab</span>
-                    <span>•</span>
-                    <span>🛁 {prop.bathrooms} bañ</span>
-                    <span>•</span>
+                    {prop.bedrooms > 0 && (
+                      <>
+                        <span>🛏️ {prop.bedrooms} hab</span>
+                        <span>•</span>
+                      </>
+                    )}
+                    {prop.bathrooms > 0 && (
+                      <>
+                        <span>🛁 {prop.bathrooms} bañ</span>
+                        <span>•</span>
+                      </>
+                    )}
                     <span>📐 {prop.area} m²</span>
                   </div>
 

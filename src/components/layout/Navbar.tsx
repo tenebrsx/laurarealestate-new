@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Heart, Search, X } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
@@ -143,6 +143,11 @@ export default function Navbar() {
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const { favorites } = useFavorites();
   const router = useRouter();
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   // Search Modal Dialog States & Refs
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
