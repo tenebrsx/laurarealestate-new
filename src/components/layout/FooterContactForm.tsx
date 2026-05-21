@@ -5,12 +5,17 @@ import { Mail, Phone, ArrowRight, CheckCircle2 } from 'lucide-react';
 import './Footer.css';
 
 export default function FooterContactForm() {
+    const [isMounted, setIsMounted] = useState(false);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [message, setMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
+
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -57,7 +62,29 @@ export default function FooterContactForm() {
 
                     {/* Right Contact Form Card */}
                     <div className="footer-cta-form-container">
-                        {isSubmitted ? (
+                        {!isMounted ? (
+                            <div className="property-cta-form-skeleton animate-pulse" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '1.5rem', opacity: 0.6 }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <div style={{ height: '14px', width: '30%', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }} />
+                                    <div style={{ height: '46px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }} />
+                                </div>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        <div style={{ height: '14px', width: '50%', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }} />
+                                        <div style={{ height: '46px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }} />
+                                    </div>
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        <div style={{ height: '14px', width: '50%', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }} />
+                                        <div style={{ height: '46px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <div style={{ height: '14px', width: '20%', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }} />
+                                    <div style={{ height: '90px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }} />
+                                </div>
+                                <div style={{ height: '48px', background: 'rgba(212, 175, 55, 0.15)', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }} />
+                            </div>
+                        ) : isSubmitted ? (
                             <div className="form-success-state">
                                 <CheckCircle2 size={48} className="icon-gold animate-scale-in" />
                                 <h3>¡Solicitud Recibida!</h3>
@@ -74,7 +101,6 @@ export default function FooterContactForm() {
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         required 
-                                        suppressHydrationWarning={true}
                                     />
                                 </div>
                                 <div className="form-row">
@@ -87,7 +113,6 @@ export default function FooterContactForm() {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required 
-                                            suppressHydrationWarning={true}
                                         />
                                     </div>
                                     <div className="form-group">
@@ -99,7 +124,6 @@ export default function FooterContactForm() {
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
                                             required 
-                                            suppressHydrationWarning={true}
                                         />
                                     </div>
                                 </div>
@@ -112,7 +136,6 @@ export default function FooterContactForm() {
                                         value={message}
                                         onChange={(e) => setMessage(e.target.value)}
                                         required
-                                        suppressHydrationWarning={true}
                                     ></textarea>
                                 </div>
                                 <button type="submit" className="btn btn-primary w-full" disabled={isSubmitting}>
