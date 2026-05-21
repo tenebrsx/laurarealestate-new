@@ -39,7 +39,7 @@ export async function getOverridesStore(): Promise<OverridesStore> {
     try {
       const snapshot = await db.collection('property_overrides').get();
       const store: OverridesStore = {};
-      snapshot.forEach(doc => {
+      snapshot.forEach((doc: any) => {
         store[doc.id] = doc.data() as PropertyOverride;
       });
       return store;
