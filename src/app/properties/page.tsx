@@ -18,6 +18,7 @@ interface PropertiesPageProps {
         bathrooms?: string;
         min_area?: string;
         max_area?: string;
+        query?: string;
     }>;
 }
 
@@ -37,6 +38,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
     if (params.bathrooms) filters.bathrooms = params.bathrooms;
     if (params.min_area) filters.min_area = params.min_area;
     if (params.max_area) filters.max_area = params.max_area;
+    if (params.query) filters.query = params.query;
 
     const { properties, pagination } = await getProperties(20, currentPage, filters);
 
@@ -54,6 +56,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
         if (filters.bathrooms) query.set('bathrooms', String(filters.bathrooms));
         if (filters.min_area) query.set('min_area', String(filters.min_area));
         if (filters.max_area) query.set('max_area', String(filters.max_area));
+        if (filters.query) query.set('query', String(filters.query));
         return `/properties?${query.toString()}`;
     };
 
@@ -61,14 +64,20 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
         <div className="properties-page">
             <div className="container" style={{ paddingTop: 'var(--space-2xl)' }}>
 
-                {/* Advanced Filtering Trigger */}
-                <PropertiesFilterWrapper />
-
-                {/* Results count */}
-                <div className="results-header">
-                    <p className="results-count">
+                {/* Properties Header with Centered Title, Subtitle, and Filter Trigger */}
+                <div className="properties-header">
+                    <span className="text-eyebrow">Catálogo</span>
+                    <h1 className="properties-title">
+                        {params.query ? (
+                             <>Resultados para <span className="text-accent">&quot;{params.query}&quot;</span></>
+                        ) : (
+                            <>Explora Nuestras <span className="text-accent">Propiedades</span></>
+                        )}
+                    </h1>
+                    <p className="properties-subtitle">
                         {pagination.total} propiedades encontradas
                     </p>
+                    <PropertiesFilterWrapper />
                 </div>
 
                 <div className="properties-grid animate-fade-in">

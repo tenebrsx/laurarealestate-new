@@ -1,0 +1,28 @@
+.similar-properties-section {
+    margin-top: var(--space-4xl);
+    padding-top: var(--space-4xl);
+    border-top: 1px solid var(--border-color);
+}
+
+.similar-properties-section .section-header {
+    margin-bottom: var(--space-2xl);
+    text-align: center;
+}
+
+.similar-properties-section .section-title {
+    font-size: var(--text-3xl);
+    color: var(--text-primary);
+}
+
+.similar-properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-xl);
+}
+
+@media (max-width: 768px) {
+    .similar-properties-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+    }
+}

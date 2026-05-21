@@ -1,8 +1,7 @@
-import { getProperties, getPropertyById } from '@/services/easybroker';
+import { getPropertyById, getAllProperties } from '@/services/easybroker';
 import DynamicPropertiesMap from '@/components/map/DynamicPropertiesMap';
 import { Metadata } from 'next';
 import { Property } from '@/types/property';
-import PropertiesFilterWrapper from '@/components/properties/PropertiesFilterWrapper';
 
 export const metadata: Metadata = {
     title: 'Mapa de Propiedades | Laura Alba Bienes Raíces Exclusivos',
@@ -40,30 +39,66 @@ export default async function MapBrowsePage({ searchParams }: MapBrowsePageProps
     if (params.min_area) filters.min_area = params.min_area;
     if (params.max_area) filters.max_area = params.max_area;
 
-    // 1. Fetch a list of properties (list endpoint doesn't have coordinates)
-    // We will loop to fetch up to 4 pages (200 properties max) to prevent serverless timeouts
-    let allListProperties: Property[] = [];
-    let currentPage = 1;
-    let hasMorePages = true;
+    // 1. Fetch the consolidated catalog (downloads all pages in a single parallel pass)
+    let allListProperties = await getAllProperties();
 
-    while (hasMorePages) {
-        // Fetch up to 50 items per page with filters
-        const { properties, pagination } = await getProperties(50, currentPage, filters);
-        allListProperties = [...allListProperties, ...properties];
-
-        // Safety limit to 200 properties to prevent insane API spam/timeouts during SSR
-        if (currentPage >= pagination.totalPages || currentPage >= 4) {
-            hasMorePages = false;
-        } else {
-            currentPage++;
-        }
+    // 2. Apply filters in a single clean pass matching getProperties logic
+    if (filters.operation_type) {
+        allListProperties = allListProperties.filter(
+            (p: Property) => p.operationType === filters.operation_type
+        );
     }
+    if (filters.property_type) {
+        const pType = String(filters.property_type).toLowerCase();
+        allListProperties = allListProperties.filter(
+            (p: Property) => p.propertyType?.toLowerCase() === pType
+        );
+    }
+    if (filters.location) {
+        const locQuery = String(filters.location).toLowerCase().trim();
+        allListProperties = allListProperties.filter(
+            (p: Property) => p.location?.toLowerCase().includes(locQuery)
+        );
+    }
+    if (filters.min_price) {
+        allListProperties = allListProperties.filter(
+            (p: Property) => p.price >= Number(filters.min_price)
+        );
+    }
+    if (filters.max_price) {
+        allListProperties = allListProperties.filter(
+            (p: Property) => p.price <= Number(filters.max_price)
+        );
+    }
+    if (filters.bedrooms) {
+        allListProperties = allListProperties.filter(
+            (p: Property) => p.bedrooms >= parseInt(String(filters.bedrooms))
+        );
+    }
+    if (filters.bathrooms) {
+        allListProperties = allListProperties.filter(
+            (p: Property) => p.bathrooms >= parseFloat(String(filters.bathrooms))
+        );
+    }
+    if (filters.min_area) {
+        allListProperties = allListProperties.filter(
+            (p: Property) => p.area >= Number(filters.min_area)
+        );
+    }
+    if (filters.max_area) {
+        allListProperties = allListProperties.filter(
+            (p: Property) => p.area <= Number(filters.max_area)
+        );
+    }
+
+    // Safety limit to 150 properties to prevent insane API spam/timeouts during SSR
+    allListProperties = allListProperties.slice(0, 150);
 
     // 2. Fetch full details for each property to get latitude & longitude
     // Next.js will cache these individual fetch calls automatically under the hood
     // Process in smaller batches using Promise.all to avoid rate-limiting spikes
     const chunkSize = 20;
-    const detailedProperties: Property[] = [];
+    const detailedProperties: (Property | null)[] = [];
 
     for (let i = 0; i < allListProperties.length; i += chunkSize) {
         const chunk = allListProperties.slice(i, i + chunkSize);
@@ -75,14 +110,11 @@ export default async function MapBrowsePage({ searchParams }: MapBrowsePageProps
 
     // 3. Filter out any that failed to load or don't have coordinates
     const mappableProperties = detailedProperties.filter(
-        (p): p is Property => p !== undefined && p.latitude !== undefined && p.longitude !== undefined
+        (p): p is Property => p !== null && p !== undefined && p.latitude !== undefined && p.longitude !== undefined
     );
 
     return (
-        <main style={{ position: 'relative' }}>
-            <div style={{ position: 'absolute', top: '100px', right: '20px', zIndex: 1000 }}>
-                <PropertiesFilterWrapper />
-            </div>
+        <main>
             <DynamicPropertiesMap properties={mappableProperties} />
         </main>
     );

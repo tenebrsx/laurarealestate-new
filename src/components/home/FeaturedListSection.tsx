@@ -19,7 +19,7 @@ export default function FeaturedListSection({ properties }: FeaturedListSectionP
     <section className="featured-list-section container animate-fade-in">
       <div className="section-header text-center">
         <span className="text-eyebrow">Portafolio</span>
-        <h2 className="home-section-title">Seleccionadas para ti</h2>
+        <h2 className="home-section-title">Propiedades destacadas</h2>
         <p className="section-subtitle">Explora nuestra colección selecta de las propiedades más exclusivas de Santo Domingo.</p>
       </div>
 

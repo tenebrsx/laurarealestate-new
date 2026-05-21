@@ -5,6 +5,7 @@ import { X, Heart, Trash2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useFavorites } from '@/context/FavoritesContext';
+import { formatCurrency } from '@/utils/format';
 import './FavoritesDrawer.css';
 
 interface FavoritesDrawerProps {
@@ -67,11 +68,7 @@ export default function FavoritesDrawer({ isOpen, onClose }: FavoritesDrawerProp
                                         <h3>{property.title}</h3>
                                         <p className="favorite-location">{property.location}</p>
                                         <p className="favorite-price">
-                                            {new Intl.NumberFormat('en-US', {
-                                                style: 'currency',
-                                                currency: property.currency,
-                                                maximumFractionDigits: 0,
-                                            }).format(property.price)}
+                                            {formatCurrency(property.price, property.currency)}
                                         </p>
                                         <div className="favorite-actions">
                                             <Link 

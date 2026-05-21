@@ -18,4 +18,5 @@ export interface Property {
     imageUrl: string;
     description?: string;
     images?: string[];
+    amenities?: string[];
 }

@@ -1,20 +1,28 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Mail, Phone, MapPin, Instagram, Linkedin } from 'lucide-react';
+import FooterContactForm from './FooterContactForm';
 import './Footer.css';
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
+    const pathname = usePathname();
+    
+    // Completely hide footer on map browse view to make it strictly full viewport map page
+    if (pathname === '/mapa') {
+        return null;
+    }
+    
+    // Checks if the route matches /properties/[id] (excluding listing page)
+    const isPropertyDetailPage = pathname?.match(/^\/properties\/[^/]+$/);
 
     return (
         <footer className="footer">
-            <div className="footer-mini-cta">
-                <div className="container footer-mini-cta-container">
-                    <p>¿Quieres vender o alquilar tu propiedad?</p>
-                    <Link href="/about" className="footer-btn-cta">Contáctanos</Link>
-                </div>
-            </div>
+            {!isPropertyDetailPage && (
+                <FooterContactForm />
+            )}
 
             <div className="container footer-content">
                 <div className="footer-brand">

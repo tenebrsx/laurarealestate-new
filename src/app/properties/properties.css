@@ -4,20 +4,40 @@
     padding-bottom: var(--space-4xl);
 }
 
-.results-header {
+.properties-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    margin-bottom: var(--space-xl);
-    padding: var(--space-md) 0;
-    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+    gap: var(--space-xs);
 }
 
-.results-count {
+.properties-title {
+    font-family: var(--font-serif);
+    font-size: clamp(var(--text-3xl), 6vw, var(--text-5xl));
+    color: var(--text-primary);
+    margin-top: var(--space-xs);
+    margin-bottom: var(--space-xs);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+}
+
+.properties-title .text-accent {
+    color: var(--accent-primary);
+}
+
+.properties-subtitle {
     font-size: var(--text-sm);
     color: var(--text-secondary);
     letter-spacing: 0.05em;
     font-weight: 500;
+    margin-bottom: var(--space-md);
+}
+
+.properties-header .filter-wrapper-container {
+    justify-content: center;
+    margin-bottom: 0;
 }
 
 .properties-grid {

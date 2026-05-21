@@ -19,7 +19,7 @@ export default function FavoriteButton({ property, showLabel = false }: Favorite
             onClick={() => toggleFavorite(property)}
             aria-label={active ? "Quitar de favoritos" : "Guardar en favoritos"}
         >
-            <Heart size={20} fill={active ? "var(--accent-primary)" : "transparent"} stroke={active ? "var(--accent-primary)" : "white"} />
+            <Heart size={20} fill={active ? "var(--accent-primary)" : "transparent"} stroke={active ? "var(--accent-primary)" : "currentColor"} />
             {showLabel && <span>{active ? "Guardado" : "Guardar"}</span>}
         </button>
     );

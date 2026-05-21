@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getOverridesStore, saveOverrideForProperty } from '@/services/overrides';
+import { getOverridesStore, saveOverrideForProperty, deleteOverrideForProperty } from '@/services/overrides';
 
 export const dynamic = 'force-dynamic'; // Prevent Next.js from caching the JSON reads
 
 export async function GET() {
-  const store = getOverridesStore();
+  const store = await getOverridesStore();
   return NextResponse.json(store);
 }
 
@@ -17,15 +17,37 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing id or override payload' }, { status: 400 });
     }
 
-    const success = saveOverrideForProperty(id, override);
+    const success = await saveOverrideForProperty(id, override);
     
     if (success) {
       return NextResponse.json({ success: true, message: 'Override applied successfully.' });
     } else {
-      return NextResponse.json({ error: 'Failed to save override to disk' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to save override' }, { status: 500 });
     }
   } catch (error) {
     console.error('Error in POST /api/overrides:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    
+    if (!id) {
+      return NextResponse.json({ error: 'Missing property id' }, { status: 400 });
+    }
+
+    const success = await deleteOverrideForProperty(id);
+    
+    if (success) {
+      return NextResponse.json({ success: true, message: 'Override reverted successfully.' });
+    } else {
+      return NextResponse.json({ error: 'Failed to delete override' }, { status: 500 });
+    }
+  } catch (error) {
+    console.error('Error in DELETE /api/overrides:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

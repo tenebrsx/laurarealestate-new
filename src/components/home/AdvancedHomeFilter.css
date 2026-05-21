@@ -215,7 +215,8 @@
         width: 100%;
     }
 
-    .price-inputs .filter-input {
+    .price-inputs .filter-input,
+    .price-inputs .filter-select {
         flex: 1;
         min-width: 0;
     }

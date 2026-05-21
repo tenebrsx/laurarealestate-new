@@ -1,4 +1,4 @@
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useState, FormEvent, useEffect } from 'react';
 import './PropertiesFilterSidebar.css';
 
@@ -10,6 +10,7 @@ interface PropertiesFilterSidebarProps {
 export default function PropertiesFilterSidebar({ isOpen, onClose }: PropertiesFilterSidebarProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     // Base Filters
     const [propertyType, setPropertyType] = useState(searchParams.get('property_type') || '');
@@ -52,6 +53,10 @@ export default function PropertiesFilterSidebar({ isOpen, onClose }: PropertiesF
 
         const query = new URLSearchParams();
         query.set('page', '1'); // Reset to page 1 on new filter
+        
+        // Preserve general search query
+        const searchQuery = searchParams.get('query');
+        if (searchQuery) query.set('query', searchQuery);
 
         // Base Filters
         if (propertyType) query.set('property_type', propertyType);
@@ -67,7 +72,7 @@ export default function PropertiesFilterSidebar({ isOpen, onClose }: PropertiesF
         if (minArea) query.set('min_area', minArea);
         if (maxArea) query.set('max_area', maxArea);
 
-        router.push(`/properties?${query.toString()}`);
+        router.push(`${pathname}?${query.toString()}`);
         onClose();
     };
 
@@ -82,7 +87,14 @@ export default function PropertiesFilterSidebar({ isOpen, onClose }: PropertiesF
         setBathrooms('');
         setMinArea('');
         setMaxArea('');
-        router.push('/properties');
+        
+        const currentQuery = searchParams.get('query');
+        if (currentQuery) {
+            router.push(`${pathname}?query=${encodeURIComponent(currentQuery)}`);
+        } else {
+            router.push(pathname);
+        }
+        
         onClose();
     };
 

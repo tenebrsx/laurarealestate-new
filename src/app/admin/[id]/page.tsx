@@ -20,7 +20,7 @@ export default async function AdminEditPage({ params }: { params: Promise<{ id: 
     notFound();
   }
   
-  const overrides = getOverridesStore();
+  const overrides = await getOverridesStore();
   const currentOverride = overrides[id];
 
   return (

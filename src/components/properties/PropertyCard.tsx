@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, BedDouble, Bath, Car, Maximize2, Heart } from 'lucide-react';
+import { MapPin, BedDouble, Bath, Car, Maximize2, Heart, ChevronRight } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
+import { formatCurrency } from '@/utils/format';
 import './PropertyCard.css';
 
 interface PropertyProps {
@@ -22,6 +23,7 @@ interface PropertyProps {
     parking?: number;
     area: number;
     imageUrl: string;
+    images?: string[];
 }
 
 export default function PropertyCard({
@@ -30,7 +32,6 @@ export default function PropertyCard({
     location,
     price,
     currency,
-    formattedPrice,
     priceUnit,
     operationType,
     operationTypes,
@@ -57,11 +58,7 @@ export default function PropertyCard({
 
     // Standard currency formatter
     const formatValue = (val: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: currency,
-            maximumFractionDigits: 0,
-        }).format(val) + ` ${currency}`;
+        return formatCurrency(val, currency);
     };
 
     if (isResidential) {
@@ -103,7 +100,10 @@ export default function PropertyCard({
     })();
 
     return (
-        <Link href={`/properties/${id}`} className="property-card">
+        <Link 
+            href={`/properties/${id}`} 
+            className="property-card"
+        >
             <div className="property-image-container">
                 <Image 
                     src={imageUrl} 
@@ -133,10 +133,6 @@ export default function PropertyCard({
                 >
                     <Heart size={20} fill={active ? "var(--accent-primary)" : "transparent"} stroke={active ? "var(--accent-primary)" : "white"} />
                 </button>
-
-                <div className="property-overlay">
-                    <span className="view-btn">Ver Detalles</span>
-                </div>
             </div>
 
             <div className="property-details">
@@ -151,14 +147,18 @@ export default function PropertyCard({
                 <div className="property-metrics">
                     {!isTerreno && (
                         <>
-                            <div className="metric">
-                                <BedDouble size={16} />
-                                <span className="metric-value">{bedrooms}</span>
-                            </div>
-                            <div className="metric">
-                                <Bath size={16} />
-                                <span className="metric-value">{bathrooms}</span>
-                            </div>
+                            {bedrooms > 0 && (
+                                <div className="metric">
+                                    <BedDouble size={16} />
+                                    <span className="metric-value">{bedrooms}</span>
+                                </div>
+                            )}
+                            {bathrooms > 0 && (
+                                <div className="metric">
+                                    <Bath size={16} />
+                                    <span className="metric-value">{bathrooms}</span>
+                                </div>
+                            )}
                             {parking !== undefined && parking > 0 && (
                                 <div className="metric">
                                     <Car size={16} />
@@ -183,6 +183,11 @@ export default function PropertyCard({
                                 {secondaryPriceDisplay}
                             </span>
                         )}
+                    </div>
+
+                    <div className="view-property-btn">
+                        <span>Ver Propiedad</span>
+                        <ChevronRight size={16} />
                     </div>
                 </div>
             </div>

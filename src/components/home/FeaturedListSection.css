@@ -4,6 +4,19 @@
     padding-bottom: var(--space-3xl);
 }
 
+.featured-list-section .section-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.featured-list-section .text-eyebrow {
+    font-size: var(--text-sm); /* Enhanced size for luxury editorial layout */
+    letter-spacing: 0.25em;
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+    display: block;
+}
+
 .section-subtitle {
     font-size: var(--text-md);
     color: var(--text-secondary);
@@ -79,7 +92,8 @@
 }
 
 .property-row-badge-category {
-    background: rgba(181, 143, 85, 0.95); /* Solid premium gold */
+    background: rgba(181, 143, 85, 0.95);
+    /* Solid premium gold */
     color: #ffffff;
     padding: 0.4rem 1rem;
     font-size: var(--text-xs);
