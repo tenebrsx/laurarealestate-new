@@ -570,7 +570,7 @@ export async function getProperties(limit = 20, page = 1, filters?: FilterParams
     }
 }
 
-export async function getPropertyById(id: string): Promise<Property | null> {
+export async function getPropertyById(id: string, options?: { throwOnTransientError?: boolean }): Promise<Property | null> {
     const apiKey = process.env.EASYBROKER_API_KEY;
 
     if (!apiKey) {
@@ -588,7 +588,9 @@ export async function getPropertyById(id: string): Promise<Property | null> {
         });
 
         if (!res.ok) {
-            throw new Error(`EasyBroker API responded with status: ${res.status}`);
+            const err = new Error(`EasyBroker API responded with status: ${res.status}`) as Error & { status?: number };
+            err.status = res.status;
+            throw err;
         }
 
         const data = await res.json();
@@ -596,6 +598,13 @@ export async function getPropertyById(id: string): Promise<Property | null> {
         return mapPropertyData(data, undefined, overrides[data.public_id]);
     } catch (error) {
         console.error(`Error fetching property ${id}:`, error);
+        if (options?.throwOnTransientError) {
+            const status = (error as { status?: number })?.status;
+            // Only a real "doesn't exist" is a 404. Rate limits / network errors must throw so
+            // ISR keeps serving the last good page instead of caching a 404 for a live listing.
+            if (status === 404 || status === 410) return null;
+            throw error;
+        }
         return null;
     }
 }

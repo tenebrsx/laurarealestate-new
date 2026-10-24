@@ -55,7 +55,7 @@ interface PageProps {
 export default async function PropertyDetailPage({ params }: PageProps) {
     // Await the params per Next.js 15 guidelines
     const resolvedParams = await params;
-    const property = await getPropertyById(resolvedParams.id);
+    const property = await getPropertyById(resolvedParams.id, { throwOnTransientError: true });
 
     if (!property) {
         notFound();
