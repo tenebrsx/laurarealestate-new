@@ -354,7 +354,39 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = 3, de
 }
 
 // Fetches all published properties from EasyBroker in parallel and caches the consolidated list.
+// Per-instance memo. Next's fetch data cache (stale-while-revalidate) kept serving
+// week-old listings on Firebase's Cloud Functions backend, because background
+// revalidation doesn't reliably finish there. A short TTL keeps the catalog in sync
+// with EasyBroker without hammering the API.
+const ALL_PROPERTIES_TTL_MS = 5 * 60 * 1000;
+let allPropertiesMemo: { at: number; data: Property[] } | null = null;
+let allPropertiesInFlight: Promise<Property[]> | null = null;
+
+export function clearAllPropertiesMemo() {
+    allPropertiesMemo = null;
+}
+
 export async function getAllProperties(): Promise<Property[]> {
+    if (allPropertiesMemo && Date.now() - allPropertiesMemo.at < ALL_PROPERTIES_TTL_MS) {
+        return allPropertiesMemo.data;
+    }
+    if (!allPropertiesInFlight) {
+        allPropertiesInFlight = fetchAllPropertiesUncached()
+            .then((data) => {
+                // Don't memoize an empty/failed result.
+                if (data.length > 0) {
+                    allPropertiesMemo = { at: Date.now(), data };
+                    return data;
+                }
+                // Fetch failed: keep serving the last good catalog if this instance has one.
+                return allPropertiesMemo?.data ?? data;
+            })
+            .finally(() => { allPropertiesInFlight = null; });
+    }
+    return allPropertiesInFlight;
+}
+
+async function fetchAllPropertiesUncached(): Promise<Property[]> {
     const apiKey = process.env.EASYBROKER_API_KEY;
 
     if (!apiKey) {
@@ -373,7 +405,7 @@ export async function getAllProperties(): Promise<Property[]> {
                 'X-Authorization': apiKey,
                 'Content-Type': 'application/json',
             },
-            next: { tags: ['properties'], revalidate: 300 } // Cache for 5 minutes (300s)
+            cache: 'no-store' // Freshness handled by the in-memory TTL cache below (Next's data cache served stale lists on Cloud Functions)
         });
 
         if (!firstPageRes.ok) {
@@ -399,17 +431,16 @@ export async function getAllProperties(): Promise<Property[]> {
                             'X-Authorization': apiKey,
                             'Content-Type': 'application/json',
                         },
-                        next: { tags: ['properties'], revalidate: 300 }
+                        cache: 'no-store'
                     }).then(async (res) => {
                         if (!res.ok) {
-                            console.error(`EasyBroker API page ${p} failed with status: ${res.status}`);
-                            return [];
+                            throw new Error(`EasyBroker API page ${p} failed with status: ${res.status}`);
                         }
                         const json = await res.json();
                         return (json.content as EasyBrokerProperty[]) || [];
                     }).catch(err => {
                         console.error(`Error fetching page ${p} of EasyBroker properties:`, err);
-                        return [];
+                        throw err; // never publish a silently truncated catalog
                     })
                 );
             }
