@@ -1,6 +1,7 @@
 'use client';
 
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { cardImageUrl } from '@/services/cardImage';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState, useRef } from 'react';
@@ -97,7 +98,7 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
                                 onMouseLeave={() => setHoveredPropertyId(null)}
                                 onClick={() => handleCardClick(property)}
                             >
-                                <div className="card-img" style={{ backgroundImage: `url(${property.imageUrl})` }}>
+                                <div className="card-img" style={{ backgroundImage: `url(${cardImageUrl(property.imageUrl)})` }}>
                                     <div className="card-badge">
                                         {property.operationTypes && property.operationTypes.includes('sale') && property.operationTypes.includes('rental') ? (
                                             'Alq / Vta'
@@ -206,7 +207,7 @@ export default function PropertiesMapBrowse({ properties }: PropertiesMapBrowseP
                             >
                                 <Popup className="custom-popup">
                                     <div className="popup-card-wrapper">
-                                        <div className="popup-img" style={{ backgroundImage: `url(${property.imageUrl})` }}>
+                                        <div className="popup-img" style={{ backgroundImage: `url(${cardImageUrl(property.imageUrl)})` }}>
                                             <div className="popup-badge">
                                                 {property.operationType === 'rental' ? 'Alquiler' : 'Venta'}
                                             </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { cardImageUrl } from '@/services/cardImage';
 import { X, Heart, Trash2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -57,7 +58,7 @@ export default function FavoritesDrawer({ isOpen, onClose }: FavoritesDrawerProp
                                 <div key={property.id} className="favorite-item glass-panel">
                                     <div className="favorite-img-wrapper">
                                         <Image 
-                                            src={property.imageUrl} 
+                                            src={cardImageUrl(property.imageUrl)} 
                                             alt={property.title} 
                                             fill
                                             sizes="100px"

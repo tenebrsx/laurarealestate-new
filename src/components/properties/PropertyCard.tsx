@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { cardImageUrl } from '@/services/cardImage';
 import Image from 'next/image';
 import { MapPin, BedDouble, Bath, Car, Maximize2, Heart, ChevronRight } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
@@ -106,7 +107,7 @@ export default function PropertyCard({
         >
             <div className="property-image-container">
                 <Image 
-                    src={imageUrl} 
+                    src={cardImageUrl(imageUrl)} 
                     alt={cleanedTitle} 
                     className="property-image" 
                     fill

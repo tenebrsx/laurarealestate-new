@@ -1,0 +1,10 @@
+rules_version = '2';
+// Public read for upscaled listing photos only; no client writes.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /listings/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

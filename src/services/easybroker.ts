@@ -1,5 +1,6 @@
 import { Property } from "@/types/property";
 import { getOverridesStore, PropertyOverride } from "./overrides";
+import { upscaledImageUrl } from "./upscaledImages";
 
 export interface EasyBrokerImage {
     url: string;
@@ -309,9 +310,9 @@ export function mapPropertyData(data: EasyBrokerProperty, preferredOperation?: '
         bathrooms,
         parking,
         area,
-        imageUrl: (override?.images && override.images.length > 0) ? override.images[0] : (canonicalCover || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80'),
+        imageUrl: (override?.images && override.images.length > 0) ? upscaledImageUrl(override.images[0]) : upscaledImageUrl(canonicalCover || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80'),
         description: descriptionText,
-        images: override?.images || explicitImages.map((img: { url: string }) => img.url),
+        images: (override?.images || explicitImages.map((img: { url: string }) => img.url)).map(upscaledImageUrl),
         amenities
     };
 }
