@@ -13,16 +13,10 @@ import './property-detail.css';
 
 export const revalidate = 300; // Revalidate static pages in the background every 5 minutes
 
+// Render property pages on demand (ISR) instead of at build time: prerendering ~130 pages
+// hit EasyBroker's rate limit (429) and baked in stale listings.
 export async function generateStaticParams() {
-    try {
-        const properties = await getAllProperties();
-        return properties.map((prop) => ({
-            id: prop.id,
-        }));
-    } catch (error) {
-        console.error("Error generating static params for properties:", error);
-        return [];
-    }
+    return [];
 }
 
 function getAmenityIcon(id: string) {
