@@ -16,12 +16,12 @@ export default async function Home() {
       <section className="hero-section">
         <div className="hero-bg-container">
           <Image
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80"
-            alt="Bienes Raíces Exclusivos"
+            src="/hero/villa-palmar-de-ocoa.webp"
+            alt="Piscina frente al mar de una villa en primera línea de playa en Palmar de Ocoa, listada por Laura Alba"
             fill
             priority
             sizes="100vw"
-            style={{ objectFit: 'cover' }}
+            style={{ objectFit: 'cover', objectPosition: '55% 50%' }}
             className="hero-bg-img"
           />
         </div>
@@ -34,7 +34,7 @@ export default async function Home() {
               <span className="text-gold">te espera aquí</span>
             </h1>
             <p className="hero-description">
-              Propiedades seleccionadas por su diseño, ubicación and potencial de inversión.
+              Propiedades seleccionadas por su diseño, ubicación y potencial de inversión.
             </p>
           </div>
         </div>

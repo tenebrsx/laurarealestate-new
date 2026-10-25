@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
+import { clearAllPropertiesMemo } from '@/services/easybroker';
 
 export async function GET(request: NextRequest) {
     return handleRevalidation(request);
@@ -25,6 +26,7 @@ async function handleRevalidation(request: NextRequest) {
     try {
         // Trigger Next.js App Router on-demand cache revalidation
         revalidateTag('properties', 'max');
+        clearAllPropertiesMemo();
 
         return NextResponse.json({
             revalidated: true,

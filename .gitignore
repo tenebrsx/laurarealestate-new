@@ -47,3 +47,8 @@ firebase-debug.log
 scratch-*.js
 
 
+
+# upscale pipeline
+/scripts/upscale/work/
+/scripts/upscale/models/
+__pycache__/
